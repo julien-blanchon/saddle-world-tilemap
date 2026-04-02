@@ -1,0 +1,12 @@
+[package]
+name = "saddle-world-tilemap-example-support"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+bevy = { workspace = true }
+saddle-world-tilemap = { workspace = true }
+
+[lints]
+workspace = true

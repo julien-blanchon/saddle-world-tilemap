@@ -1,0 +1,18 @@
+[package]
+name = "saddle-world-tilemap"
+version = "0.1.0"
+edition = "2024"
+publish = false
+repository = "https://github.com/julien-blanchon/saddle-world-tilemap"
+license = "MIT-0"
+description = "Reusable chunk-based tilemap toolkit for Bevy"
+
+[dependencies]
+bevy = "0.18"
+
+[workspace]
+
+[lints.clippy]
+too_many_arguments = "allow"
+type_complexity = "allow"
+nonstandard_macro_braces = "warn"
