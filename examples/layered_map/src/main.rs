@@ -1,8 +1,8 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
-use support::{DETAIL_LAYER, DemoPalette, OverlayText, SQUARE_SIZE};
 use saddle_world_tilemap::{TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
+use support::{DETAIL_LAYER, DemoPalette, OverlayText, SQUARE_SIZE};
 
 #[derive(Resource)]
 struct LayeredDemo {
@@ -85,7 +85,10 @@ fn toggle_detail_layer(
 
 fn update_overlay(
     demo: Res<LayeredDemo>,
-    diagnostics: Single<&saddle_world_tilemap::TilemapDiagnostics, With<saddle_world_tilemap::TilemapRoot>>,
+    diagnostics: Single<
+        &saddle_world_tilemap::TilemapDiagnostics,
+        With<saddle_world_tilemap::TilemapRoot>,
+    >,
     mut overlay: Single<&mut Text, With<OverlayText>>,
 ) {
     overlay.0 = format!(

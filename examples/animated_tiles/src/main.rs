@@ -1,8 +1,8 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
-use support::{DemoPalette, OverlayText, SQUARE_SIZE};
 use saddle_world_tilemap::{TileAnimationLooped, TilemapDebugOverlay, TilemapPlugin};
+use support::{DemoPalette, OverlayText, SQUARE_SIZE};
 
 #[derive(Resource, Default)]
 struct AnimatedDemo {
@@ -66,7 +66,10 @@ fn count_loops(mut events: MessageReader<TileAnimationLooped>, mut demo: ResMut<
 
 fn update_overlay(
     demo: Res<AnimatedDemo>,
-    diagnostics: Single<&saddle_world_tilemap::TilemapDiagnostics, With<saddle_world_tilemap::TilemapRoot>>,
+    diagnostics: Single<
+        &saddle_world_tilemap::TilemapDiagnostics,
+        With<saddle_world_tilemap::TilemapRoot>,
+    >,
     mut overlay: Single<&mut Text, With<OverlayText>>,
 ) {
     overlay.0 = format!(

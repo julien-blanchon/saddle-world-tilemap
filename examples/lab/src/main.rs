@@ -10,11 +10,11 @@ use bevy::prelude::*;
 use bevy::remote::RemotePlugin;
 #[cfg(feature = "dev")]
 use bevy_brp_extras::BrpExtrasPlugin;
-use support::{DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, ISOMETRIC_SIZE, OverlayText};
 use saddle_world_tilemap::{
     ChunkCoord, TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapDebugSettings,
     TilemapPlugin, TilemapSystems,
 };
+use support::{DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, ISOMETRIC_SIZE, OverlayText};
 
 const LARGE_MAP_SIZE: UVec2 = UVec2::new(96, 96);
 const MAX_SQUARE_STAGE: u8 = 2;

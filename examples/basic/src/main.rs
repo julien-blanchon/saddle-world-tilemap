@@ -1,10 +1,10 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
-use support::{DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
 use saddle_world_tilemap::{
     TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapDebugSettings, TilemapPlugin,
 };
+use support::{DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
 
 #[derive(Resource)]
 struct BasicDemo {

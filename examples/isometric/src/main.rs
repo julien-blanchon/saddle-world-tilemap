@@ -1,8 +1,8 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
-use support::{DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, ISOMETRIC_SIZE, OverlayText};
 use saddle_world_tilemap::{TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
+use support::{DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, ISOMETRIC_SIZE, OverlayText};
 
 #[derive(Resource)]
 struct IsoDemo {

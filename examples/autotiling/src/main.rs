@@ -1,8 +1,8 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
-use support::{DETAIL_LAYER, DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
 use saddle_world_tilemap::{TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
+use support::{DETAIL_LAYER, DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
 
 #[derive(Resource)]
 struct AutotileDemo {
@@ -111,7 +111,10 @@ fn grow_roads(
 
 fn update_overlay(
     demo: Res<AutotileDemo>,
-    diagnostics: Single<&saddle_world_tilemap::TilemapDiagnostics, With<saddle_world_tilemap::TilemapRoot>>,
+    diagnostics: Single<
+        &saddle_world_tilemap::TilemapDiagnostics,
+        With<saddle_world_tilemap::TilemapRoot>,
+    >,
     mut overlay: Single<&mut Text, With<OverlayText>>,
 ) {
     overlay.0 = if let Some(coord) = demo.latest_coord {

@@ -1,11 +1,13 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
+use saddle_world_tilemap::{
+    TileCoord, TileRect, TilemapCommand, TilemapDebugOverlay, TilemapPlugin,
+};
 use support::{
     COLLISION_LAYER, DETAIL_LAYER, DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, OverlayText,
     SQUARE_SIZE,
 };
-use saddle_world_tilemap::{TileCoord, TileRect, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
 
 #[derive(Resource)]
 struct RuntimeEditingDemo {
@@ -223,7 +225,10 @@ fn run_edit_cycle(
 
 fn update_overlay(
     demo: Res<RuntimeEditingDemo>,
-    diagnostics: Single<&saddle_world_tilemap::TilemapDiagnostics, With<saddle_world_tilemap::TilemapRoot>>,
+    diagnostics: Single<
+        &saddle_world_tilemap::TilemapDiagnostics,
+        With<saddle_world_tilemap::TilemapRoot>,
+    >,
     mut overlay: Single<&mut Text, With<OverlayText>>,
 ) {
     let phase_label = match demo.phase % 4 {
