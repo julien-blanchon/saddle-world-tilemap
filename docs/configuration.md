@@ -40,6 +40,20 @@ Controls tile placement, world conversion, and chunk bounds.
 
 - `TilemapGeometry::square(tile_size)`
 - `TilemapGeometry::isometric_diamond(tile_render_size)`
+- `TilemapGeometry::hex_pointy_columns(tile_render_size, TilemapHexParity)`
+- `TilemapGeometry::hex_flat_rows(tile_render_size, TilemapHexParity)`
+
+### Orientation variants
+
+- `TilemapOrientation::Square`
+- `TilemapOrientation::IsometricDiamond`
+- `TilemapOrientation::HexPointyColumns(TilemapHexParity)`
+- `TilemapOrientation::HexFlatRows(TilemapHexParity)`
+
+### `TilemapHexParity`
+
+- `TilemapHexParity::Odd`
+- `TilemapHexParity::Even`
 
 ### Builders
 
@@ -52,6 +66,8 @@ Controls tile placement, world conversion, and chunk bounds.
 - keep `grid_size.x > 0.0` and `grid_size.y > 0.0`
 - for square maps, `grid_size` and `tile_render_size` usually match
 - for isometric maps, `grid_size` should stay half-width and half-height of the rendered diamond unless you are intentionally stretching or overlapping tiles
+- for pointy-column hex maps, `tile_render_size` should match the full rendered hex footprint and parity should match the source data layout
+- for flat-row hex maps, `tile_render_size` should match the full rendered hex footprint and parity should match the source data layout
 - `row_direction = Down` matches common 2D screen-space conventions
 
 ## `Tilemap`
@@ -123,7 +139,7 @@ Visual settings for a renderable layer.
 ### Guidance
 
 - use larger `z_index` values for overlays, highlights, or decals
-- `chunk_sort_step` only matters for isometric chunk ordering
+- `chunk_sort_step` matters for isometric and hex chunk ordering
 - transparent oversized art should live on a dedicated layer when you need explicit ordering control
 
 ## `TileAtlasLayout`
@@ -234,3 +250,38 @@ Runtime debug resource.
 
 - enable this in labs and sandboxes, not by default in shipping game scenes
 - dirty chunk drawing is useful for validating edit locality and animation rebuild scopes
+
+## `TiledImportOptions`
+
+Runtime import surface for normalized Tiled JSON ingestion.
+
+### Fields
+
+- `atlas: TileAtlasLayout`
+- `catalog: TileCatalog`
+- `gid_to_kind: BTreeMap<u32, TileKindId>`
+- `chunk_size: UVec2`
+- `origin: Vec2`
+- `row_direction: TileRowDirection`
+- `layer_z_step: f32`
+- `logic_only_layers: BTreeSet<String>`
+
+### Constructor
+
+- `TiledImportOptions::new(atlas, catalog, gid_to_kind)`
+
+### Guidance
+
+- `gid_to_kind` should map stripped Tiled global tile IDs, not flip-flagged values
+- `logic_only_layers` is useful for collision, nav, and metadata layers that should import but not render
+- `layer_z_step` becomes the per-layer `z_index` increment for imported visual layers
+- `origin` and `row_direction` should match the world-space convention used by the rest of your app
+
+## `ImportedTilemapScene`
+
+### Fields
+
+- `map: Tilemap`
+- `object_spawns: Vec<TileObjectSpawn>`
+
+The importer intentionally returns normalized object-layer spawn descriptors instead of spawning entities directly. That keeps scene/entity instantiation policy outside the durable tile runtime.

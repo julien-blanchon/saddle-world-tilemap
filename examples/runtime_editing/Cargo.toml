@@ -7,6 +7,7 @@ publish = false
 [dependencies]
 bevy = { workspace = true }
 saddle-world-tilemap = { workspace = true }
+saddle-pane = { workspace = true }
 saddle-world-tilemap-example-support = { path = "../support" }
 
 [lints]

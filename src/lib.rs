@@ -7,6 +7,7 @@ mod components;
 mod config;
 mod coordinates;
 mod debug;
+mod import;
 mod layer;
 mod rendering;
 mod systems;
@@ -33,9 +34,14 @@ pub use components::{
 };
 pub use config::TileAtlasLayout;
 pub use coordinates::{
-    ChunkCoord, TileCoord, TileRect, TileRowDirection, TilemapGeometry, TilemapOrientation,
+    ChunkCoord, TileCoord, TileRect, TileRowDirection, TilemapGeometry, TilemapHexParity,
+    TilemapOrientation,
 };
 pub use debug::{TilemapDebugOverlay, TilemapDebugSettings};
+pub use import::{
+    ImportedTilemapScene, TileObjectSpawn, TilePropertyValue, TiledImportError,
+    TiledImportOptions, import_tiled_json_str,
+};
 pub use layer::{
     TileCatalog, TileCell, TileKind, TileKindId, TileLayerConfig, TileLayerId,
     TileLayerRenderConfig, TileLayerState, TileOrientation, TileRenderRule, TileVisual, Tilemap,
@@ -134,6 +140,8 @@ impl Plugin for TilemapPlugin {
             .register_type::<TilemapLayerNode>()
             .register_type::<TileLayerRenderConfig>()
             .register_type::<TileLayerState>()
+            .register_type::<TileObjectSpawn>()
+            .register_type::<TilePropertyValue>()
             .register_type::<TileOrientation>()
             .register_type::<TileRect>()
             .register_type::<TileRenderRule>()
@@ -144,6 +152,7 @@ impl Plugin for TilemapPlugin {
             .register_type::<TilemapDebugSettings>()
             .register_type::<TilemapDiagnostics>()
             .register_type::<TilemapGeometry>()
+            .register_type::<TilemapHexParity>()
             .register_type::<TilemapOrientation>()
             .register_type::<TilemapRenderChunk>()
             .register_type::<TilemapRoot>()

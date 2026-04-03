@@ -1,6 +1,7 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
+use saddle_pane::prelude::*;
 use saddle_world_tilemap::{TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
 use support::{DETAIL_LAYER, DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
 
@@ -29,9 +30,11 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(support::pane_plugins())
         .add_plugins(TilemapPlugin::default())
+        .register_pane::<support::TilemapExamplePane>()
         .add_systems(Startup, setup)
-        .add_systems(Update, (grow_roads, update_overlay))
+        .add_systems(Update, (support::sync_example_pane, grow_roads, update_overlay))
         .run();
 }
 

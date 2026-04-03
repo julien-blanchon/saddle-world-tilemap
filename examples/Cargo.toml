@@ -3,6 +3,7 @@ members = [
     "support",
     "basic",
     "isometric",
+    "hex_strategy",
     "runtime_editing",
     "autotiling",
     "animated_tiles",
@@ -14,6 +15,11 @@ resolver = "3"
 [workspace.dependencies]
 bevy = { version = "0.18" }
 saddle-world-tilemap = { path = ".." }
+saddle-pane = { git = "https://github.com/julien-blanchon/saddle-pane" }
+bevy_flair = "0.7"
+bevy_input_focus = "0.18"
+bevy_ui_widgets = "0.18"
+saddle-world-hex-grid = { git = "https://github.com/julien-blanchon/saddle-world-hex-grid" }
 
 [workspace.lints.clippy]
 too_many_arguments = "allow"

@@ -1,13 +1,14 @@
 [package]
-name = "saddle-world-tilemap-example-animated-tiles"
+name = "saddle-world-tilemap-example-hex-strategy"
 version = "0.1.0"
 edition = "2024"
 publish = false
 
 [dependencies]
 bevy = { workspace = true }
-saddle-world-tilemap = { workspace = true }
 saddle-pane = { workspace = true }
+saddle-world-hex-grid = { workspace = true }
+saddle-world-tilemap = { workspace = true }
 saddle-world-tilemap-example-support = { path = "../support" }
 
 [lints]

@@ -7,6 +7,11 @@ publish = false
 [dependencies]
 bevy = { workspace = true }
 saddle-world-tilemap = { workspace = true }
+saddle-pane = { workspace = true }
+bevy_flair = { workspace = true }
+bevy_input_focus = { workspace = true }
+bevy_ui_widgets = { workspace = true }
+saddle-world-hex-grid = { workspace = true }
 
 [lints]
 workspace = true

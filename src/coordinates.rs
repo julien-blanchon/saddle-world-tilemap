@@ -134,9 +134,28 @@ impl TileRowDirection {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
 #[reflect(Debug, Clone, PartialEq, Hash)]
+pub enum TilemapHexParity {
+    Odd,
+    Even,
+}
+
+impl TilemapHexParity {
+    #[must_use]
+    pub const fn is_shifted(self, index: i32) -> bool {
+        match self {
+            Self::Odd => index & 1 != 0,
+            Self::Even => index & 1 == 0,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Reflect)]
+#[reflect(Debug, Clone, PartialEq, Hash)]
 pub enum TilemapOrientation {
     Square,
     IsometricDiamond,
+    HexPointyColumns(TilemapHexParity),
+    HexFlatRows(TilemapHexParity),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Reflect)]
@@ -173,6 +192,31 @@ impl TilemapGeometry {
     }
 
     #[must_use]
+    pub fn hex_pointy_columns(
+        tile_render_size: Vec2,
+        parity: TilemapHexParity,
+    ) -> Self {
+        Self {
+            orientation: TilemapOrientation::HexPointyColumns(parity),
+            grid_size: Vec2::new(tile_render_size.x * 0.75, tile_render_size.y),
+            tile_render_size,
+            origin: Vec2::ZERO,
+            row_direction: TileRowDirection::Down,
+        }
+    }
+
+    #[must_use]
+    pub fn hex_flat_rows(tile_render_size: Vec2, parity: TilemapHexParity) -> Self {
+        Self {
+            orientation: TilemapOrientation::HexFlatRows(parity),
+            grid_size: Vec2::new(tile_render_size.x, tile_render_size.y * 0.75),
+            tile_render_size,
+            origin: Vec2::ZERO,
+            row_direction: TileRowDirection::Down,
+        }
+    }
+
+    #[must_use]
     pub fn with_origin(mut self, origin: Vec2) -> Self {
         self.origin = origin;
         self
@@ -202,6 +246,27 @@ impl TilemapGeometry {
                 self.origin.y
                     + (tile.x + tile.y) as f32 * self.grid_size.y * self.row_direction.sign(),
             ),
+            TilemapOrientation::HexPointyColumns(parity) => Vec2::new(
+                self.origin.x + tile.x as f32 * self.grid_size.x,
+                self.origin.y
+                    + (tile.y as f32 * self.grid_size.y
+                        + if parity.is_shifted(tile.x) {
+                            self.tile_render_size.y * 0.5
+                        } else {
+                            0.0
+                        })
+                        * self.row_direction.sign(),
+            ),
+            TilemapOrientation::HexFlatRows(parity) => Vec2::new(
+                self.origin.x
+                    + tile.x as f32 * self.grid_size.x
+                    + if parity.is_shifted(tile.y) {
+                        self.tile_render_size.x * 0.5
+                    } else {
+                        0.0
+                    },
+                self.origin.y + tile.y as f32 * self.grid_size.y * self.row_direction.sign(),
+            ),
         }
     }
 
@@ -227,6 +292,24 @@ impl TilemapGeometry {
                     ((fx + fy) * 0.5).round() as i32,
                     ((fy - fx) * 0.5).round() as i32,
                 )
+            }
+            TilemapOrientation::HexPointyColumns(parity) => {
+                let guess_x = (local.x / self.grid_size.x).round() as i32;
+                let guess_y = ((local.y / row_sign - hex_column_vertical_offset(
+                    parity,
+                    guess_x,
+                    self.tile_render_size.y,
+                )) / self.grid_size.y)
+                    .round() as i32;
+                self.closest_hex_coord(local, TileCoord::new(guess_x, guess_y))
+            }
+            TilemapOrientation::HexFlatRows(parity) => {
+                let guess_y = (local.y / (self.grid_size.y * row_sign)).round() as i32;
+                let guess_x = ((local.x
+                    - hex_row_horizontal_offset(parity, guess_y, self.tile_render_size.x))
+                    / self.grid_size.x)
+                    .round() as i32;
+                self.closest_hex_coord(local, TileCoord::new(guess_x, guess_y))
             }
         }
     }
@@ -284,6 +367,41 @@ impl TilemapGeometry {
         }
 
         Rect::from_corners(min, max)
+    }
+
+    fn closest_hex_coord(self, local: Vec2, guess: TileCoord) -> TileCoord {
+        let geometry = self.with_origin(Vec2::ZERO);
+        let mut best = guess;
+        let mut best_distance = geometry.tile_to_local(guess).distance_squared(local);
+
+        for dy in -2..=2 {
+            for dx in -2..=2 {
+                let candidate = guess.offset(dx, dy);
+                let distance = geometry.tile_to_local(candidate).distance_squared(local);
+                if distance < best_distance {
+                    best = candidate;
+                    best_distance = distance;
+                }
+            }
+        }
+
+        best
+    }
+}
+
+fn hex_column_vertical_offset(parity: TilemapHexParity, column: i32, tile_height: f32) -> f32 {
+    if parity.is_shifted(column) {
+        tile_height * 0.5
+    } else {
+        0.0
+    }
+}
+
+fn hex_row_horizontal_offset(parity: TilemapHexParity, row: i32, tile_width: f32) -> f32 {
+    if parity.is_shifted(row) {
+        tile_width * 0.5
+    } else {
+        0.0
     }
 }
 

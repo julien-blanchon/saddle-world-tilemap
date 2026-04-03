@@ -6,6 +6,7 @@ mod scenarios;
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
+use saddle_pane::prelude::*;
 #[cfg(feature = "dev")]
 use bevy::remote::RemotePlugin;
 #[cfg(feature = "dev")]
@@ -106,6 +107,12 @@ struct LabRuntime {
 fn main() {
     let mut app = App::new();
     app.insert_resource(ClearColor(Color::srgb(0.05, 0.06, 0.08)));
+    app.insert_resource(support::TilemapExamplePane {
+        debug_enabled: true,
+        draw_chunk_bounds: true,
+        draw_dirty_chunks: true,
+        ..default()
+    });
     app.insert_resource(LabControl::default());
     app.insert_resource(LabDiagnostics::default());
     app.insert_resource(LabRuntime::default());
@@ -121,6 +128,7 @@ fn main() {
                 ..default()
             }),
     );
+    app.add_plugins(support::pane_plugins());
     #[cfg(feature = "dev")]
     app.add_plugins(RemotePlugin::default());
     #[cfg(feature = "dev")]
@@ -135,6 +143,7 @@ fn main() {
             ..default()
         }),
     );
+    app.register_pane::<support::TilemapExamplePane>();
     app.register_type::<CameraFocus>()
         .register_type::<LabControl>()
         .register_type::<LabDiagnostics>()
@@ -151,6 +160,7 @@ fn main() {
         .add_systems(
             Update,
             (
+                support::sync_example_pane,
                 handle_debug_input,
                 apply_camera_focus,
                 apply_square_stage,

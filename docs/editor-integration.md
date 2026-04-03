@@ -1,6 +1,6 @@
 # `saddle-world-tilemap` Editor Integration
 
-`saddle-world-tilemap` intentionally does not ship Tiled or LDtk parsers in the runtime crate. The core data model is still designed so those adapters fit cleanly on top.
+`saddle-world-tilemap` now ships a normalized Tiled JSON importer and still keeps LDtk as an adapter concern. The core data model remains the durable runtime boundary either way.
 
 ## Integration rule
 
@@ -17,6 +17,21 @@ The adapter's job is to translate editor concepts into:
 - `TileCollisionDescriptor`
 
 Once that translation is done, gameplay code should only talk to the `saddle-world-tilemap` runtime types.
+
+## Built-in Tiled path
+
+Use `import_tiled_json_str(...)` when you want to translate a Tiled JSON asset directly into:
+
+- `Tilemap`
+- `TileLayerState`
+- `TileObjectSpawn`
+
+The caller still owns:
+
+- tileset asset loading
+- `gid -> TileKindId` mapping
+- which imported layers are visual vs logic-only
+- how object-layer spawns become actual entities or scenes
 
 ## Mapping Tiled concepts
 
@@ -76,22 +91,22 @@ LDtk IntGrid layers are a good fit for:
 
 If the data is more expressive than a `u32` flag set, keep the richer structure in an adapter-owned asset and use `saddle-world-tilemap` only for the cross-cutting runtime pieces.
 
-## Recommended adapter workflow
+## Recommended workflow
 
 1. Load or parse the external editor format into an adapter-owned asset.
 2. Build a `TileCatalog` from the referenced tilesets.
 3. Allocate stable `TileLayerId` values for each runtime layer.
 4. Convert the editor coordinates into `TileCoord`.
-5. Populate `TileLayerState` and `Tilemap`.
+5. Populate `TileLayerState` and `Tilemap`, or call `import_tiled_json_str(...)` for Tiled JSON.
 6. Spawn the result through `TilemapBundle`.
 
 This keeps editor concerns isolated from the runtime crate and makes it easier to support multiple import sources later.
 
 ## What should stay outside the core crate
 
-- file parsing
+- LDtk parsing
 - tileset asset resolution policies
-- editor entity layers
+- entity or scene spawning policy
 - editor-specific property schemas
 - one-off content rules
 
