@@ -39,8 +39,8 @@ pub use coordinates::{
 };
 pub use debug::{TilemapDebugOverlay, TilemapDebugSettings};
 pub use import::{
-    ImportedTilemapScene, TileObjectSpawn, TilePropertyValue, TiledImportError,
-    TiledImportOptions, import_tiled_json_str,
+    ImportedTilemapScene, TileObjectSpawn, TilePropertyValue, TiledImportError, TiledImportOptions,
+    import_tiled_json_str,
 };
 pub use layer::{
     TileCatalog, TileCell, TileKind, TileKindId, TileLayerConfig, TileLayerId,

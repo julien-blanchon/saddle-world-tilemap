@@ -29,7 +29,10 @@ fn main() {
         .register_pane::<support::TilemapExamplePane>()
         .init_resource::<AnimatedDemo>()
         .add_systems(Startup, setup)
-        .add_systems(Update, (support::sync_example_pane, count_loops, update_overlay))
+        .add_systems(
+            Update,
+            (support::sync_example_pane, count_loops, update_overlay),
+        )
         .run();
 }
 

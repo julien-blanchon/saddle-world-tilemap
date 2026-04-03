@@ -75,7 +75,10 @@ impl TiledImportOptions {
 pub enum TiledImportError {
     Parse(serde_json::Error),
     UnsupportedOrientation(String),
-    UnsupportedHexStagger { axis: Option<String>, index: Option<String> },
+    UnsupportedHexStagger {
+        axis: Option<String>,
+        index: Option<String>,
+    },
     MissingLayerData(String),
     InvalidLayerDimensions(String),
     UnknownTileGid(u32),
@@ -97,9 +100,14 @@ impl std::fmt::Display for TiledImportError {
                 write!(f, "tile layer '{layer_name}' has neither data nor chunks")
             }
             Self::InvalidLayerDimensions(layer_name) => {
-                write!(f, "tile layer '{layer_name}' is missing width or height information")
+                write!(
+                    f,
+                    "tile layer '{layer_name}' is missing width or height information"
+                )
             }
-            Self::UnknownTileGid(gid) => write!(f, "no TileKindId mapping was provided for gid {gid}"),
+            Self::UnknownTileGid(gid) => {
+                write!(f, "no TileKindId mapping was provided for gid {gid}")
+            }
         }
     }
 }
@@ -166,7 +174,8 @@ fn import_tile_layer(
     state: &mut TileLayerState,
 ) -> Result<(), TiledImportError> {
     let layer_id = state.config.id;
-    let mut map = Tilemap::new(TilemapGeometry::default(), options.chunk_size).with_layer(state.clone());
+    let mut map =
+        Tilemap::new(TilemapGeometry::default(), options.chunk_size).with_layer(state.clone());
 
     if let Some(data) = &layer.data {
         let width = layer.width.unwrap_or(0);
@@ -212,7 +221,11 @@ fn insert_gid(
         .get(&gid)
         .copied()
         .ok_or(TiledImportError::UnknownTileGid(gid))?;
-    map.set_tile(layer_id, coord, TileCell::new(kind).with_orientation(orientation));
+    map.set_tile(
+        layer_id,
+        coord,
+        TileCell::new(kind).with_orientation(orientation),
+    );
     Ok(())
 }
 
@@ -232,15 +245,12 @@ fn import_object_layer(
             object.x + layer_offset.x,
             object.y * options.row_direction.sign() + layer_offset.y,
         );
-        let tile_anchor = object
-            .gid
-            .map(|_| {
-                Vec2::new(
-                    raw_position.x,
-                    raw_position.y
-                        - map_data.tile_height as f32 * options.row_direction.sign(),
-                )
-            });
+        let tile_anchor = object.gid.map(|_| {
+            Vec2::new(
+                raw_position.x,
+                raw_position.y - map_data.tile_height as f32 * options.row_direction.sign(),
+            )
+        });
         let coord = tile_anchor
             .or(Some(raw_position))
             .map(|local| geometry.local_to_tile(local + options.origin));

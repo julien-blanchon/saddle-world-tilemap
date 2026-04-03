@@ -9,8 +9,8 @@ use saddle_world_tilemap::{
     AutotileBinding, AutotileGroupId, AutotileNeighborhood, AutotileRuleSet, AutotileRuleSetId,
     TileAnimation, TileAtlasLayout, TileCatalog, TileCell, TileCollisionDescriptor, TileCoord,
     TileKind, TileKindId, TileLayerConfig, TileLayerId, TileLayerRenderConfig, TileLayerState,
-    Tilemap, TilemapBundle, TilemapDebugOverlay, TilemapDebugSettings, TilemapGeometry,
-    TileRowDirection, TilemapHexParity,
+    TileRowDirection, Tilemap, TilemapBundle, TilemapDebugOverlay, TilemapDebugSettings,
+    TilemapGeometry, TilemapHexParity,
 };
 
 pub const GROUND_LAYER: TileLayerId = TileLayerId::new(1);
@@ -103,8 +103,12 @@ pub fn sync_example_pane(
         {
             let current = render.tint.to_srgba();
             if (current.alpha - pane.highlight_alpha).abs() > 0.001 {
-                render.tint =
-                    Color::srgba(current.red, current.green, current.blue, pane.highlight_alpha);
+                render.tint = Color::srgba(
+                    current.red,
+                    current.green,
+                    current.blue,
+                    pane.highlight_alpha,
+                );
                 changed = true;
             }
         }

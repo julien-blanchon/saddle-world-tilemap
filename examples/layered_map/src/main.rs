@@ -32,7 +32,11 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (support::sync_example_pane, toggle_detail_layer, update_overlay),
+            (
+                support::sync_example_pane,
+                toggle_detail_layer,
+                update_overlay,
+            ),
         )
         .run();
 }

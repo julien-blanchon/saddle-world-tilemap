@@ -5,9 +5,7 @@ use saddle_world_tilemap_example_support as support;
 use bevy::prelude::*;
 use saddle_pane::prelude::*;
 use saddle_world_hex_grid::{AxialHex, HexPath, a_star};
-use saddle_world_tilemap::{
-    TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin,
-};
+use saddle_world_tilemap::{TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
 use support::{COLLISION_LAYER, DETAIL_LAYER, GROUND_LAYER, HIGHLIGHT_LAYER, OverlayText};
 
 #[derive(Resource)]
@@ -59,11 +57,23 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
     ]);
     for hex in &blocked {
         let coord = support::hex_axial_to_tile(*hex);
-        map.set_tile(COLLISION_LAYER, coord, saddle_world_tilemap::TileCell::new(palette.tiles.wall));
-        map.set_tile(DETAIL_LAYER, coord, saddle_world_tilemap::TileCell::new(palette.tiles.rock));
+        map.set_tile(
+            COLLISION_LAYER,
+            coord,
+            saddle_world_tilemap::TileCell::new(palette.tiles.wall),
+        );
+        map.set_tile(
+            DETAIL_LAYER,
+            coord,
+            saddle_world_tilemap::TileCell::new(palette.tiles.rock),
+        );
     }
 
-    support::spawn_camera(&mut commands, "Hex Strategy Camera", Vec3::new(0.0, 0.0, 999.0));
+    support::spawn_camera(
+        &mut commands,
+        "Hex Strategy Camera",
+        Vec3::new(0.0, 0.0, 999.0),
+    );
     support::spawn_overlay(
         &mut commands,
         "Hex strategy board rendered through saddle-world-tilemap and pathfound through saddle-world-hex-grid.\nMove the cursor across the frontier to preview the cheapest route around the canyon blockers.",

@@ -60,7 +60,10 @@ fn imports_basic_tiled_layers_and_objects() {
     "#;
 
     let imported = import_tiled_json_str(json, &test_options()).expect("imports");
-    let layer = imported.map.layer(TileLayerId::new(1)).expect("ground layer");
+    let layer = imported
+        .map
+        .layer(TileLayerId::new(1))
+        .expect("ground layer");
 
     assert_eq!(
         imported

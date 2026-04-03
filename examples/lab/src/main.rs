@@ -6,11 +6,11 @@ mod scenarios;
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
-use saddle_pane::prelude::*;
 #[cfg(feature = "dev")]
 use bevy::remote::RemotePlugin;
 #[cfg(feature = "dev")]
 use bevy_brp_extras::BrpExtrasPlugin;
+use saddle_pane::prelude::*;
 use saddle_world_tilemap::{
     ChunkCoord, TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapDebugSettings,
     TilemapPlugin, TilemapSystems,

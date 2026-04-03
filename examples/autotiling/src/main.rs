@@ -34,7 +34,10 @@ fn main() {
         .add_plugins(TilemapPlugin::default())
         .register_pane::<support::TilemapExamplePane>()
         .add_systems(Startup, setup)
-        .add_systems(Update, (support::sync_example_pane, grow_roads, update_overlay))
+        .add_systems(
+            Update,
+            (support::sync_example_pane, grow_roads, update_overlay),
+        )
         .run();
 }
 

@@ -192,10 +192,7 @@ impl TilemapGeometry {
     }
 
     #[must_use]
-    pub fn hex_pointy_columns(
-        tile_render_size: Vec2,
-        parity: TilemapHexParity,
-    ) -> Self {
+    pub fn hex_pointy_columns(tile_render_size: Vec2, parity: TilemapHexParity) -> Self {
         Self {
             orientation: TilemapOrientation::HexPointyColumns(parity),
             grid_size: Vec2::new(tile_render_size.x * 0.75, tile_render_size.y),
@@ -295,11 +292,9 @@ impl TilemapGeometry {
             }
             TilemapOrientation::HexPointyColumns(parity) => {
                 let guess_x = (local.x / self.grid_size.x).round() as i32;
-                let guess_y = ((local.y / row_sign - hex_column_vertical_offset(
-                    parity,
-                    guess_x,
-                    self.tile_render_size.y,
-                )) / self.grid_size.y)
+                let guess_y = ((local.y / row_sign
+                    - hex_column_vertical_offset(parity, guess_x, self.tile_render_size.y))
+                    / self.grid_size.y)
                     .round() as i32;
                 self.closest_hex_coord(local, TileCoord::new(guess_x, guess_y))
             }
