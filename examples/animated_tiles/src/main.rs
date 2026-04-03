@@ -1,6 +1,7 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
+use saddle_pane::prelude::*;
 use saddle_world_tilemap::{TileAnimationLooped, TilemapDebugOverlay, TilemapPlugin};
 use support::{DemoPalette, OverlayText, SQUARE_SIZE};
 
@@ -23,10 +24,15 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(support::pane_plugins())
         .add_plugins(TilemapPlugin::default())
+        .register_pane::<support::TilemapExamplePane>()
         .init_resource::<AnimatedDemo>()
         .add_systems(Startup, setup)
-        .add_systems(Update, (count_loops, update_overlay))
+        .add_systems(
+            Update,
+            (support::sync_example_pane, count_loops, update_overlay),
+        )
         .run();
 }
 

@@ -135,6 +135,8 @@ Current modes:
 
 - `Square`
 - `IsometricDiamond`
+- `HexPointyColumns`
+- `HexFlatRows`
 
 The same public helpers are used for:
 
@@ -147,11 +149,12 @@ This keeps authored content, procedural generation, and runtime picking on the s
 
 ## What is intentionally not in the core runtime
 
-- Tiled or LDtk import code
 - sparse storage
 - streaming activation or chunk culling
 - physics backend bindings
 - navmesh or visibility baking
 - save/load formats
+
+Tiled JSON translation now ships directly in the crate as a normalized import boundary. LDtk parsing and editor-specific scene/entity instantiation still stay outside the core runtime.
 
 Those are useful adapter layers, but they are not part of the durable core runtime contract in `0.1.0`.

@@ -28,6 +28,37 @@ fn isometric_geometry_round_trips() {
 }
 
 #[test]
+fn hex_pointy_geometry_round_trips() {
+    let geometry =
+        TilemapGeometry::hex_pointy_columns(Vec2::new(72.0, 80.0), TilemapHexParity::Odd);
+
+    for coord in [
+        TileCoord::new(0, 0),
+        TileCoord::new(1, 0),
+        TileCoord::new(2, 3),
+        TileCoord::new(-1, 2),
+    ] {
+        let local = geometry.tile_to_local(coord);
+        assert_eq!(geometry.local_to_tile(local), coord);
+    }
+}
+
+#[test]
+fn hex_flat_geometry_round_trips() {
+    let geometry = TilemapGeometry::hex_flat_rows(Vec2::new(80.0, 68.0), TilemapHexParity::Even);
+
+    for coord in [
+        TileCoord::new(0, 0),
+        TileCoord::new(1, 1),
+        TileCoord::new(3, 2),
+        TileCoord::new(-2, 1),
+    ] {
+        let local = geometry.tile_to_local(coord);
+        assert_eq!(geometry.local_to_tile(local), coord);
+    }
+}
+
+#[test]
 fn chunk_bounds_include_render_size() {
     let geometry =
         TilemapGeometry::square(Vec2::splat(16.0)).with_tile_render_size(Vec2::splat(20.0));

@@ -3,11 +3,14 @@ use bevy::{
     prelude::*,
     render::render_resource::{Extent3d, TextureDimension, TextureFormat},
 };
+use saddle_pane::prelude::*;
+use saddle_world_hex_grid::{AxialHex, OffsetHexMode};
 use saddle_world_tilemap::{
     AutotileBinding, AutotileGroupId, AutotileNeighborhood, AutotileRuleSet, AutotileRuleSetId,
     TileAnimation, TileAtlasLayout, TileCatalog, TileCell, TileCollisionDescriptor, TileCoord,
     TileKind, TileKindId, TileLayerConfig, TileLayerId, TileLayerRenderConfig, TileLayerState,
-    Tilemap, TilemapBundle, TilemapDebugOverlay, TilemapGeometry,
+    TileRowDirection, Tilemap, TilemapBundle, TilemapDebugOverlay, TilemapDebugSettings,
+    TilemapGeometry, TilemapHexParity,
 };
 
 pub const GROUND_LAYER: TileLayerId = TileLayerId::new(1);
@@ -17,6 +20,104 @@ pub const HIGHLIGHT_LAYER: TileLayerId = TileLayerId::new(4);
 
 pub const SQUARE_SIZE: UVec2 = UVec2::new(24, 18);
 pub const ISOMETRIC_SIZE: UVec2 = UVec2::new(12, 10);
+pub const HEX_OFFSET_MODE: OffsetHexMode = OffsetHexMode::OddRows;
+pub const HEX_BOARD_RADIUS: u32 = 4;
+
+#[derive(Resource, Pane)]
+#[pane(title = "Tilemap")]
+pub struct TilemapExamplePane {
+    #[pane(toggle)]
+    pub debug_enabled: bool,
+    #[pane(toggle)]
+    pub draw_chunk_bounds: bool,
+    #[pane(toggle)]
+    pub draw_dirty_chunks: bool,
+    #[pane(toggle)]
+    pub detail_layer_visible: bool,
+    #[pane(slider, min = 0.05, max = 1.0, step = 0.05)]
+    pub highlight_alpha: f32,
+    #[pane(toggle)]
+    pub rows_face_up: bool,
+}
+
+impl Default for TilemapExamplePane {
+    fn default() -> Self {
+        Self {
+            debug_enabled: false,
+            draw_chunk_bounds: false,
+            draw_dirty_chunks: false,
+            detail_layer_visible: true,
+            highlight_alpha: 0.92,
+            rows_face_up: false,
+        }
+    }
+}
+
+pub fn pane_plugins() -> (
+    bevy_flair::FlairPlugin,
+    bevy_input_focus::InputDispatchPlugin,
+    bevy_ui_widgets::UiWidgetsPlugins,
+    bevy_input_focus::tab_navigation::TabNavigationPlugin,
+    saddle_pane::PanePlugin,
+) {
+    (
+        bevy_flair::FlairPlugin,
+        bevy_input_focus::InputDispatchPlugin,
+        bevy_ui_widgets::UiWidgetsPlugins,
+        bevy_input_focus::tab_navigation::TabNavigationPlugin,
+        saddle_pane::PanePlugin,
+    )
+}
+
+pub fn sync_example_pane(
+    pane: Res<TilemapExamplePane>,
+    mut debug: ResMut<TilemapDebugSettings>,
+    mut maps: Query<&mut Tilemap>,
+) {
+    debug.enabled = pane.debug_enabled;
+    debug.draw_chunk_bounds = pane.draw_chunk_bounds;
+    debug.draw_dirty_chunks = pane.draw_dirty_chunks;
+
+    for mut map in &mut maps {
+        let mut changed = false;
+
+        let desired_row_direction = if pane.rows_face_up {
+            TileRowDirection::Up
+        } else {
+            TileRowDirection::Down
+        };
+        if map.geometry.row_direction != desired_row_direction {
+            map.geometry.row_direction = desired_row_direction;
+            changed = true;
+        }
+
+        if let Some(detail) = map.layer(DETAIL_LAYER)
+            && detail.config.visible != pane.detail_layer_visible
+        {
+            map.set_layer_visibility(DETAIL_LAYER, pane.detail_layer_visible);
+            changed = true;
+        }
+
+        if let Some(layer) = map.layer_mut(HIGHLIGHT_LAYER)
+            && let Some(render) = layer.config.render.as_mut()
+        {
+            let current = render.tint.to_srgba();
+            if (current.alpha - pane.highlight_alpha).abs() > 0.001 {
+                render.tint = Color::srgba(
+                    current.red,
+                    current.green,
+                    current.blue,
+                    pane.highlight_alpha,
+                );
+                changed = true;
+            }
+        }
+
+        if changed {
+            map.mark_all_dirty();
+        }
+    }
+}
 
 #[derive(Component)]
 pub struct OverlayText;
@@ -382,6 +483,78 @@ pub fn build_large_map(palette: &DemoPalette, size: UVec2) -> Tilemap {
     }
 
     map
+}
+
+pub fn build_hex_strategy_map(palette: &DemoPalette) -> (Tilemap, Vec<AxialHex>) {
+    let geometry = TilemapGeometry::hex_flat_rows(Vec2::new(58.0, 50.0), TilemapHexParity::Odd)
+        .with_origin(Vec2::new(-220.0, -160.0));
+    let mut map = Tilemap::new(geometry, UVec2::splat(8));
+    let catalog = palette.catalog();
+
+    map.insert_layer(TileLayerState::new(
+        TileLayerConfig::visual(
+            GROUND_LAYER,
+            "Ground",
+            TileLayerRenderConfig::new(palette.atlas.clone()).with_z_index(0.0),
+        ),
+        catalog.clone(),
+    ));
+    map.insert_layer(TileLayerState::new(
+        TileLayerConfig::visual(
+            DETAIL_LAYER,
+            "Detail",
+            TileLayerRenderConfig::new(palette.atlas.clone()).with_z_index(2.0),
+        ),
+        catalog.clone(),
+    ));
+    map.insert_layer(TileLayerState::new(
+        TileLayerConfig::logic_only(COLLISION_LAYER, "Collision"),
+        catalog.clone(),
+    ));
+    map.insert_layer(TileLayerState::new(
+        TileLayerConfig::visual(
+            HIGHLIGHT_LAYER,
+            "Highlight",
+            TileLayerRenderConfig::new(palette.atlas.clone())
+                .with_z_index(4.0)
+                .with_tint(Color::srgba(1.0, 1.0, 1.0, 0.92)),
+        ),
+        catalog,
+    ));
+
+    let coords: Vec<_> = AxialHex::ZERO.hexagon(HEX_BOARD_RADIUS).collect();
+    for hex in &coords {
+        let coord = hex_axial_to_tile(*hex);
+        let terrain = if hex.length() == HEX_BOARD_RADIUS {
+            palette.tiles.rock
+        } else if (hex.q - hex.r).unsigned_abs() <= 1 {
+            palette.tiles.soil
+        } else if (hex.q + hex.r).unsigned_abs() % 3 == 0 {
+            palette.tiles.sand
+        } else {
+            palette.tiles.grass
+        };
+        map.set_tile(GROUND_LAYER, coord, TileCell::new(terrain));
+
+        if (hex.q + hex.r) % 3 == 0 && hex.length() < HEX_BOARD_RADIUS {
+            map.set_tile(
+                DETAIL_LAYER,
+                coord,
+                TileCell::new(palette.tiles.flower).with_tint(Color::srgb(1.0, 0.95, 0.82)),
+            );
+        }
+    }
+
+    (map, coords)
+}
+
+pub fn hex_axial_to_tile(hex: AxialHex) -> TileCoord {
+    let offset = hex.to_offset(HEX_OFFSET_MODE);
+    TileCoord::new(offset.col, offset.row)
+}
+
+pub fn hex_tile_to_axial(coord: TileCoord) -> AxialHex {
+    saddle_world_hex_grid::OffsetHex::new(coord.x, coord.y).to_axial(HEX_OFFSET_MODE)
 }
 
 pub fn square_runtime_edit_coords() -> Vec<TileCoord> {

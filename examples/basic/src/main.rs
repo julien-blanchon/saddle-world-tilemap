@@ -1,6 +1,7 @@
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
+use saddle_pane::prelude::*;
 use saddle_world_tilemap::{
     TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapDebugSettings, TilemapPlugin,
 };
@@ -15,6 +16,11 @@ struct BasicDemo {
 
 fn main() {
     App::new()
+        .insert_resource(support::TilemapExamplePane {
+            debug_enabled: true,
+            draw_chunk_bounds: true,
+            ..default()
+        })
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -27,6 +33,7 @@ fn main() {
                     ..default()
                 }),
         )
+        .add_plugins(support::pane_plugins())
         .add_plugins(
             TilemapPlugin::default().with_debug_settings(TilemapDebugSettings {
                 enabled: true,
@@ -34,8 +41,9 @@ fn main() {
                 ..default()
             }),
         )
+        .register_pane::<support::TilemapExamplePane>()
         .add_systems(Startup, setup)
-        .add_systems(Update, update_hover)
+        .add_systems(Update, (support::sync_example_pane, update_hover))
         .run();
 }
 

@@ -54,8 +54,16 @@ pub(crate) fn build_chunk_mesh(
     if matches!(
         map.geometry.orientation,
         TilemapOrientation::IsometricDiamond
+            | TilemapOrientation::HexPointyColumns(_)
+            | TilemapOrientation::HexFlatRows(_)
     ) {
-        draw_order.sort_by_key(|(_, coord, _)| (coord.x + coord.y, coord.x));
+        draw_order.sort_by(|(_, left, _), (_, right, _)| {
+            let left = map.geometry.tile_to_local(*left);
+            let right = map.geometry.tile_to_local(*right);
+            left.y
+                .total_cmp(&right.y)
+                .then_with(|| left.x.total_cmp(&right.x))
+        });
     }
 
     for (_, coord, visual) in draw_order {
@@ -107,13 +115,14 @@ pub(crate) fn chunk_local_translation(
     let origin = chunk.tile_origin(map.chunk_size);
     let local = map.geometry.tile_to_local(origin) + layer.config.offset;
     let z = render.map_or(0.0, |render| {
-        let chunk_depth = if matches!(
-            map.geometry.orientation,
-            TilemapOrientation::IsometricDiamond
-        ) {
-            (chunk.x + chunk.y) as f32 * render.chunk_sort_step
-        } else {
-            0.0
+        let chunk_depth = match map.geometry.orientation {
+            TilemapOrientation::IsometricDiamond => {
+                (chunk.x + chunk.y) as f32 * render.chunk_sort_step
+            }
+            TilemapOrientation::HexPointyColumns(_) | TilemapOrientation::HexFlatRows(_) => {
+                map.geometry.tile_to_local(origin).y * render.chunk_sort_step
+            }
+            TilemapOrientation::Square => 0.0,
         };
         render.z_index + chunk_depth
     });
