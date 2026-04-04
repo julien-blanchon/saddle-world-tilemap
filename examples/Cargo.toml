@@ -4,6 +4,7 @@ members = [
     "basic",
     "isometric",
     "hex_strategy",
+    "roguelike_showcase",
     "runtime_editing",
     "autotiling",
     "animated_tiles",

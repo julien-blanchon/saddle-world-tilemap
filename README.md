@@ -194,6 +194,7 @@ Tile edits mark dirty chunks. The runtime then resolves only the affected chunks
 | `layered_map` | layer visibility toggles over ground, detail, and logic-only layers |
 | `isometric` | isometric world-to-tile picking and movement-cost metadata |
 | `hex_strategy` | hex board rendering through tilemap plus `saddle-world-hex-grid` pathfinding |
+| `roguelike_showcase` | P0 integration demo layering `saddle-procgen-dungeon-gen`, `saddle-ai-fov`, and `saddle-world-fog-of-war` onto a playable tilemap dungeon |
 | `saddle-world-tilemap-lab` | crate-local BRP/E2E lab covering smoke, runtime edits, isometric picks, large-map sweeps, and manual debug controls |
 
 Every shipped example now includes a live `saddle-pane` control surface for debug toggles and the most useful layout parameters.
@@ -208,7 +209,14 @@ cargo run -p saddle-world-tilemap-example-animated-tiles
 cargo run -p saddle-world-tilemap-example-layered-map
 cargo run -p saddle-world-tilemap-example-isometric
 cargo run -p saddle-world-tilemap-example-hex-strategy
+cargo run -p saddle-world-tilemap-example-roguelike-showcase
 cargo run -p saddle-world-tilemap-lab
+```
+
+Smoke-check the integration showcase with:
+
+```bash
+cargo run -p saddle-world-tilemap-example-roguelike-showcase --features e2e -- roguelike_showcase_smoke
 ```
 
 ## Dependency philosophy

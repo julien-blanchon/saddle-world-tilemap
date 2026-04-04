@@ -1,0 +1,22 @@
+[package]
+name = "saddle-world-tilemap-example-roguelike-showcase"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[features]
+e2e = ["dep:saddle-bevy-e2e"]
+
+[dependencies]
+bevy = { workspace = true }
+saddle-pane = { workspace = true }
+saddle-world-tilemap = { workspace = true }
+saddle-world-tilemap-example-support = { path = "../support" }
+saddle-procgen-dungeon-gen = { git = "https://github.com/julien-blanchon/saddle-procgen-dungeon-gen" }
+saddle-ai-fov = { git = "https://github.com/julien-blanchon/saddle-ai-fov" }
+saddle-world-fog-of-war = { git = "https://github.com/julien-blanchon/saddle-world-fog-of-war" }
+bevy_enhanced_input = "0.24"
+saddle-bevy-e2e = { git = "https://github.com/julien-blanchon/saddle-bevy-e2e", features = ["json"], optional = true }
+
+[lints]
+workspace = true
