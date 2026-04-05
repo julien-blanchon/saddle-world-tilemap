@@ -9,6 +9,7 @@ mod coordinates;
 mod debug;
 mod import;
 mod layer;
+mod pathfinding;
 mod rendering;
 mod systems;
 
@@ -46,6 +47,7 @@ pub use layer::{
     TileCatalog, TileCell, TileKind, TileKindId, TileLayerConfig, TileLayerId,
     TileLayerRenderConfig, TileLayerState, TileOrientation, TileRenderRule, TileVisual, Tilemap,
 };
+pub use pathfinding::{TilePathOptions, TilePathResult, find_path, reachable_tiles};
 
 #[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum TilemapSystems {

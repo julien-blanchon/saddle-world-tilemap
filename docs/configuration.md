@@ -251,6 +251,35 @@ Runtime debug resource.
 - enable this in labs and sandboxes, not by default in shipping game scenes
 - dirty chunk drawing is useful for validating edit locality and animation rebuild scopes
 
+## `TilePathOptions`
+
+Options for the A* pathfinding algorithm.
+
+### Fields
+
+- `max_cost: u32` — maximum total path cost before giving up. Default: `u32::MAX`
+- `diagonal: bool` — whether to allow diagonal movement on square/iso grids. Default: `false`
+
+### Builders
+
+- `with_max_cost(u32)`
+- `with_diagonal(bool)`
+
+### Guidance
+
+- set `max_cost` to limit search radius for performance or gameplay reasons
+- `diagonal = true` allows 8-directional movement; path steps include diagonals
+- hex grids ignore the `diagonal` flag and always use 6 neighbors
+
+## `TilePathResult`
+
+Result of a successful pathfinding query.
+
+### Fields
+
+- `path: Vec<TileCoord>` — ordered tile coordinates from start to goal (inclusive)
+- `total_cost: u32` — accumulated movement cost along the path
+
 ## `TiledImportOptions`
 
 Runtime import surface for normalized Tiled JSON ingestion.

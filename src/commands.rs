@@ -31,6 +31,27 @@ pub enum TilemapCommand {
         layer: TileLayerId,
         visible: bool,
     },
+    FillCircle {
+        map: Entity,
+        layer: TileLayerId,
+        center: TileCoord,
+        radius: u32,
+        tile: TileCell,
+    },
+    FillLine {
+        map: Entity,
+        layer: TileLayerId,
+        from: TileCoord,
+        to: TileCoord,
+        tile: TileCell,
+    },
+    FloodFill {
+        map: Entity,
+        layer: TileLayerId,
+        start: TileCoord,
+        tile: TileCell,
+        max_tiles: usize,
+    },
 }
 
 #[derive(Message, Debug, Clone)]

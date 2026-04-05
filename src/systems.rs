@@ -248,6 +248,45 @@ pub(crate) fn apply_commands(
                     visible: *visible,
                 });
             }
+            TilemapCommand::FillCircle {
+                map,
+                layer,
+                center,
+                radius,
+                tile,
+            } => {
+                let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
+                    continue;
+                };
+                tilemap.fill_circle(*layer, *center, *radius, tile.clone());
+                diagnostics.tile_edits_this_frame += 1;
+            }
+            TilemapCommand::FillLine {
+                map,
+                layer,
+                from,
+                to,
+                tile,
+            } => {
+                let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
+                    continue;
+                };
+                tilemap.fill_line(*layer, *from, *to, tile.clone());
+                diagnostics.tile_edits_this_frame += 1;
+            }
+            TilemapCommand::FloodFill {
+                map,
+                layer,
+                start,
+                tile,
+                max_tiles,
+            } => {
+                let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
+                    continue;
+                };
+                let filled = tilemap.flood_fill(*layer, *start, tile.clone(), *max_tiles);
+                diagnostics.tile_edits_this_frame += filled;
+            }
         }
     }
 }

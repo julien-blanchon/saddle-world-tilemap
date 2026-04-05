@@ -445,6 +445,68 @@ impl Tilemap {
         }
     }
 
+    pub fn fill_circle(
+        &mut self,
+        layer_id: TileLayerId,
+        center: TileCoord,
+        radius: u32,
+        tile: TileCell,
+    ) {
+        let r = radius as i32;
+        for dy in -r..=r {
+            for dx in -r..=r {
+                if dx * dx + dy * dy <= r * r {
+                    self.set_tile(layer_id, center.offset(dx, dy), tile.clone());
+                }
+            }
+        }
+    }
+
+    pub fn fill_line(
+        &mut self,
+        layer_id: TileLayerId,
+        from: TileCoord,
+        to: TileCoord,
+        tile: TileCell,
+    ) {
+        for coord in bresenham_line(from, to) {
+            self.set_tile(layer_id, coord, tile.clone());
+        }
+    }
+
+    pub fn flood_fill(
+        &mut self,
+        layer_id: TileLayerId,
+        start: TileCoord,
+        tile: TileCell,
+        max_tiles: usize,
+    ) -> usize {
+        let target_kind = self.get_tile(layer_id, start).map(|c| c.kind);
+        if target_kind == Some(tile.kind) {
+            return 0;
+        }
+        let mut stack = vec![start];
+        let mut visited = std::collections::BTreeSet::new();
+        let mut count = 0;
+        while let Some(coord) = stack.pop() {
+            if !visited.insert(coord) || count >= max_tiles {
+                continue;
+            }
+            let current_kind = self.get_tile(layer_id, coord).map(|c| c.kind);
+            if current_kind != target_kind {
+                continue;
+            }
+            self.set_tile(layer_id, coord, tile.clone());
+            count += 1;
+            for neighbor in coord.cardinal_neighbors() {
+                if !visited.contains(&neighbor) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+        count
+    }
+
     pub fn set_layer_visibility(&mut self, layer_id: TileLayerId, visible: bool) {
         if let Some(layer) = self.layers.get_mut(&layer_id) {
             layer.config.visible = visible;
@@ -534,6 +596,33 @@ impl Default for Tilemap {
             UVec2::splat(16),
         )
     }
+}
+
+fn bresenham_line(from: TileCoord, to: TileCoord) -> Vec<TileCoord> {
+    let mut coords = Vec::new();
+    let dx = (to.x - from.x).abs();
+    let dy = -(to.y - from.y).abs();
+    let sx = if from.x < to.x { 1 } else { -1 };
+    let sy = if from.y < to.y { 1 } else { -1 };
+    let mut err = dx + dy;
+    let mut x = from.x;
+    let mut y = from.y;
+    loop {
+        coords.push(TileCoord::new(x, y));
+        if x == to.x && y == to.y {
+            break;
+        }
+        let e2 = 2 * err;
+        if e2 >= dy {
+            err += dy;
+            x += sx;
+        }
+        if e2 <= dx {
+            err += dx;
+            y += sy;
+        }
+    }
+    coords
 }
 
 #[cfg(test)]

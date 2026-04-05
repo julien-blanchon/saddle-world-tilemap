@@ -91,6 +91,9 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
   - `SetTile`
   - `ClearTile`
   - `FillRect`
+  - `FillCircle`
+  - `FillLine`
+  - `FloodFill`
   - `SwapTiles`
   - `SetLayerVisibility`
 - `TileChanged`
@@ -145,6 +148,34 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 - `TileCollisionShape`
 - `TileCollisionCell`
 
+### Pathfinding
+
+- `find_path(map, layer_id, start, goal, options) -> Option<TilePathResult>` — A* search on a tile layer, respecting movement costs and collision
+- `reachable_tiles(map, layer_id, start, max_cost, diagonal) -> BTreeMap<TileCoord, u32>` — Dijkstra flood returning all tiles reachable within a cost budget
+- `TilePathOptions` — configuration: `max_cost`, `diagonal`
+- `TilePathResult` — result: `path: Vec<TileCoord>`, `total_cost: u32`
+
+Pathfinding supports all orientation modes (square, isometric, hex). Tiles with a `TileCollisionDescriptor` are treated as impassable. Movement cost comes from `TileKind.movement_cost`.
+
+### Fill helpers
+
+Direct methods on `Tilemap`:
+
+- `fill_circle(layer_id, center, radius, tile)` — Euclidean radius fill
+- `fill_line(layer_id, from, to, tile)` — Bresenham line rasterization
+- `flood_fill(layer_id, start, tile, max_tiles) -> usize` — flood fill with safety limit
+
+These are also available as `TilemapCommand` variants (`FillCircle`, `FillLine`, `FloodFill`) for message-driven usage.
+
+### Coordinate helpers on `TileCoord`
+
+- `cardinal_neighbors()` — 4 orthogonal neighbors
+- `eight_neighbors()` — 8 including diagonals
+- `hex_neighbors_pointy(parity)` — 6 hex neighbors (pointy-top stagger)
+- `hex_neighbors_flat(parity)` — 6 hex neighbors (flat-top stagger)
+- `manhattan_distance(other)` — L1 distance
+- `chebyshev_distance(other)` — L∞ distance
+
 ### Tiled import
 
 - `import_tiled_json_str`
@@ -194,8 +225,11 @@ Tile edits mark dirty chunks. The runtime then resolves only the affected chunks
 | `layered_map` | layer visibility toggles over ground, detail, and logic-only layers |
 | `isometric` | isometric world-to-tile picking and movement-cost metadata |
 | `hex_strategy` | hex board rendering through tilemap plus `saddle-world-hex-grid` pathfinding |
+| `rpg_village` | top-down RPG village with A* pathfinding, buildings, roads, water, and fences |
+| `platformer` | side-scrolling platformer with gravity, collision layer, and platform jumping |
+| `tile_painter` | runtime tile editor with pencil, line, circle, flood fill, and eraser brush modes |
 | `roguelike_showcase` | P0 integration demo layering `saddle-procgen-dungeon-gen`, `saddle-ai-fov`, and `saddle-world-fog-of-war` onto a playable tilemap dungeon |
-| `saddle-world-tilemap-lab` | crate-local BRP/E2E lab covering smoke, runtime edits, isometric picks, large-map sweeps, and manual debug controls |
+| `saddle-world-tilemap-lab` | crate-local BRP/E2E lab covering smoke, runtime edits, isometric picks, large-map sweeps, pathfinding, and manual debug controls |
 
 Every shipped example now includes a live `saddle-pane` control surface for debug toggles and the most useful layout parameters.
 
@@ -209,6 +243,9 @@ cargo run -p saddle-world-tilemap-example-animated-tiles
 cargo run -p saddle-world-tilemap-example-layered-map
 cargo run -p saddle-world-tilemap-example-isometric
 cargo run -p saddle-world-tilemap-example-hex-strategy
+cargo run -p saddle-world-tilemap-example-rpg-village
+cargo run -p saddle-world-tilemap-example-platformer
+cargo run -p saddle-world-tilemap-example-tile-painter
 cargo run -p saddle-world-tilemap-example-roguelike-showcase
 cargo run -p saddle-world-tilemap-lab
 ```

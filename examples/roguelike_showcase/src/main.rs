@@ -563,20 +563,22 @@ fn opacity_map_from_dungeon(dungeon: &DungeonMap) -> GridOpacityMap {
 }
 
 fn dungeon_config(pane: &RoguelikePane) -> DungeonConfig {
-    let mut config = DungeonConfig::default();
-    config.width = GRID_DIMENSIONS.x;
-    config.height = GRID_DIMENSIONS.y;
-    config.seed = DungeonSeed(pane.seed as u64);
-    config.loop_density = pane.loop_density;
+    let mut config = DungeonConfig {
+        width: GRID_DIMENSIONS.x,
+        height: GRID_DIMENSIONS.y,
+        seed: DungeonSeed(pane.seed as u64),
+        loop_density: pane.loop_density,
+        lock_key: LockKeyConfig {
+            enabled: true,
+            lock_count: 1,
+        },
+        secret_rooms: SecretRoomConfig {
+            enabled: pane.secret_rooms,
+            ..default()
+        },
+        ..Default::default()
+    };
     config.rooms_corridors.room_attempts = pane.room_attempts;
-    config.lock_key = LockKeyConfig {
-        enabled: true,
-        lock_count: 1,
-    };
-    config.secret_rooms = SecretRoomConfig {
-        enabled: pane.secret_rooms,
-        ..default()
-    };
     config
 }
 

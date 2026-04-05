@@ -4,7 +4,7 @@ use bevy::prelude::*;
 use saddle_bevy_e2e::{action::Action, actions::assertions, scenario::Scenario};
 
 use crate::{CameraFocus, LabControl};
-use saddle_world_tilemap::TileCoord;
+use saddle_world_tilemap::{TileCoord, TilePathOptions, find_path, reachable_tiles};
 
 pub fn list_scenarios() -> Vec<&'static str> {
     vec![
@@ -13,6 +13,7 @@ pub fn list_scenarios() -> Vec<&'static str> {
         "tilemap_runtime_edit",
         "tilemap_isometric_pick",
         "tilemap_large_map",
+        "tilemap_pathfinding",
     ]
 }
 
@@ -23,6 +24,7 @@ pub fn scenario_by_name(name: &str) -> Option<Scenario> {
         "tilemap_runtime_edit" => Some(tilemap_runtime_edit()),
         "tilemap_isometric_pick" => Some(tilemap_isometric_pick()),
         "tilemap_large_map" => Some(tilemap_large_map()),
+        "tilemap_pathfinding" => Some(tilemap_pathfinding()),
         _ => None,
     }
 }
@@ -192,5 +194,63 @@ fn tilemap_large_map() -> Scenario {
         .then(Action::Screenshot("large_right".into()))
         .then(Action::WaitFrames(1))
         .then(assertions::log_summary("tilemap_large_map"))
+        .build()
+}
+
+fn tilemap_pathfinding() -> Scenario {
+    use saddle_world_tilemap_example_support::GROUND_LAYER;
+
+    Scenario::builder("tilemap_pathfinding")
+        .description("Run A* pathfinding and reachable-tiles flood on the square showcase map to verify the pathfinding API produces valid results at runtime.")
+        .then(wait_for_diagnostics("maps ready", |diagnostics| {
+            diagnostics.large_total_chunks >= 64
+        }))
+        .then(Action::Custom(Box::new(|world: &mut World| {
+            // Find the square showcase map entity and its Tilemap component
+            let mut query = world.query::<(&Name, &saddle_world_tilemap::Tilemap)>();
+            let (_, map) = query
+                .iter(world)
+                .find(|(name, _)| name.as_str() == "Square Showcase Map")
+                .expect("Square Showcase Map entity must exist");
+
+            // A* pathfinding: find a path from (1,1) to (10,10)
+            let start = TileCoord::new(1, 1);
+            let goal = TileCoord::new(10, 10);
+            let options = TilePathOptions::default().with_diagonal(false);
+            let result = find_path(map, GROUND_LAYER, start, goal, &options);
+            assert!(result.is_some(), "A* must find a path from (1,1) to (10,10)");
+            let path = result.unwrap();
+            assert!(path.path.len() >= 2, "Path must have at least start and end");
+            assert_eq!(path.path.first().copied(), Some(start), "Path must start at start");
+            assert_eq!(path.path.last().copied(), Some(goal), "Path must end at goal");
+            assert!(path.total_cost > 0, "Path cost must be positive");
+
+            // Verify path continuity: each step is a cardinal neighbor of the previous
+            for window in path.path.windows(2) {
+                let dx = (window[0].x - window[1].x).abs();
+                let dy = (window[0].y - window[1].y).abs();
+                assert!(
+                    (dx == 1 && dy == 0) || (dx == 0 && dy == 1),
+                    "Each path step must be a cardinal neighbor"
+                );
+            }
+
+            // Reachable tiles: flood from (5,5) with max cost 5
+            let center = TileCoord::new(5, 5);
+            let reachable = reachable_tiles(map, GROUND_LAYER, center, 5, false);
+            assert!(reachable.len() > 1, "Reachable tiles must include more than just the start");
+            assert!(reachable.contains_key(&center), "Reachable must include the start tile");
+            assert_eq!(reachable[&center], 0, "Start tile cost must be zero");
+
+            // All reachable tiles must have cost <= 5
+            for (_, cost) in &reachable {
+                assert!(*cost <= 5, "No reachable tile should exceed max_cost");
+            }
+
+            info!("Pathfinding scenario passed: path len={}, cost={}, reachable={}", path.path.len(), path.total_cost, reachable.len());
+        })))
+        .then(Action::Screenshot("pathfinding".into()))
+        .then(Action::WaitFrames(1))
+        .then(assertions::log_summary("tilemap_pathfinding"))
         .build()
 }

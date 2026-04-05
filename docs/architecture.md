@@ -147,6 +147,36 @@ The same public helpers are used for:
 
 This keeps authored content, procedural generation, and runtime picking on the same math path.
 
+## Pathfinding
+
+The crate includes two standalone pathfinding functions that operate directly on the logical tile model:
+
+- `find_path` — A* search on a named tile layer, returning the optimal path as a `Vec<TileCoord>` with total accumulated cost
+- `reachable_tiles` — Dijkstra flood from a starting tile, returning all tiles reachable within a cost budget
+
+Both functions:
+
+- read tile data from `TileLayerState` without spawning entities
+- treat tiles with a `TileCollisionDescriptor` as impassable
+- use `TileKind.movement_cost` as the per-tile cost
+- support all orientation modes through `tile_neighbors()`, which dispatches to cardinal, 8-directional, or hex-6 neighborhoods based on `TilemapOrientation`
+
+Empty tiles (no data) are passable with an implicit cost of 1.
+
+### Design choice
+
+Pathfinding operates on the logical model, not on render or collision projections. This means it stays usable even when rendering is disabled or collision chunks have not been synced yet.
+
+## Fill helpers
+
+The `Tilemap` struct provides three fill methods for common editing operations:
+
+- `fill_circle` — fills all tiles within a Euclidean radius
+- `fill_line` — Bresenham line rasterization between two tile coordinates
+- `flood_fill` — BFS flood fill from a starting tile, replacing matching tiles up to a configurable safety limit
+
+These are also exposed as `TilemapCommand` variants (`FillCircle`, `FillLine`, `FloodFill`) for message-driven usage through `MessageWriter<TilemapCommand>`.
+
 ## What is intentionally not in the core runtime
 
 - sparse storage

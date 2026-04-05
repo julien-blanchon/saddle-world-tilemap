@@ -59,6 +59,62 @@ impl TileCoord {
             self.offset(-1, -1),
         ]
     }
+
+    #[must_use]
+    pub fn hex_neighbors_pointy(self, parity: TilemapHexParity) -> [Self; 6] {
+        if parity.is_shifted(self.x) {
+            [
+                self.offset(0, -1),
+                self.offset(1, 0),
+                self.offset(1, 1),
+                self.offset(0, 1),
+                self.offset(-1, 1),
+                self.offset(-1, 0),
+            ]
+        } else {
+            [
+                self.offset(0, -1),
+                self.offset(1, -1),
+                self.offset(1, 0),
+                self.offset(0, 1),
+                self.offset(-1, 0),
+                self.offset(-1, -1),
+            ]
+        }
+    }
+
+    #[must_use]
+    pub fn hex_neighbors_flat(self, parity: TilemapHexParity) -> [Self; 6] {
+        if parity.is_shifted(self.y) {
+            [
+                self.offset(1, 0),
+                self.offset(1, 1),
+                self.offset(0, 1),
+                self.offset(-1, 0),
+                self.offset(0, -1),
+                self.offset(1, -1),
+            ]
+        } else {
+            [
+                self.offset(1, 0),
+                self.offset(0, 1),
+                self.offset(-1, 1),
+                self.offset(-1, 0),
+                self.offset(-1, -1),
+                self.offset(0, -1),
+            ]
+        }
+    }
+
+    #[must_use]
+    pub fn manhattan_distance(self, other: Self) -> u32 {
+        ((self.x - other.x).unsigned_abs()) + ((self.y - other.y).unsigned_abs())
+    }
+
+    #[must_use]
+    pub fn chebyshev_distance(self, other: Self) -> u32 {
+        ((self.x - other.x).unsigned_abs()).max((self.y - other.y).unsigned_abs())
+    }
 }
 
 impl Default for TileCoord {

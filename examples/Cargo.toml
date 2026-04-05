@@ -9,6 +9,9 @@ members = [
     "autotiling",
     "animated_tiles",
     "layered_map",
+    "rpg_village",
+    "platformer",
+    "tile_painter",
     "lab",
 ]
 resolver = "3"

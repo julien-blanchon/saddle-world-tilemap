@@ -462,7 +462,7 @@ pub fn build_large_map(palette: &DemoPalette, size: UVec2) -> Tilemap {
             let hash = deterministic_hash(x, y);
             let base = if (x - y).abs() < 2 || (x + y) % 23 == 0 {
                 palette.tiles.soil
-            } else if hash % 11 == 0 {
+            } else if hash.is_multiple_of(11) {
                 palette.tiles.sand
             } else {
                 palette.tiles.grass
@@ -472,7 +472,7 @@ pub fn build_large_map(palette: &DemoPalette, size: UVec2) -> Tilemap {
             if y % 16 == 7 || x % 19 == 9 {
                 map.set_tile(DETAIL_LAYER, coord, TileCell::new(palette.tiles.road));
             }
-            if hash % 41 == 0 {
+            if hash.is_multiple_of(41) {
                 map.set_tile(
                     DETAIL_LAYER,
                     coord,
