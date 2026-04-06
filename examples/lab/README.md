@@ -16,7 +16,7 @@ Working
 ## Run
 
 ```bash
-cargo run -p tilemap_lab
+cargo run -p saddle-world-tilemap-lab
 ```
 
 Controls:
@@ -29,10 +29,11 @@ Controls:
 ## E2E scenarios
 
 ```bash
-cargo run -p tilemap_lab --features e2e -- tilemap_smoke
-cargo run -p tilemap_lab --features e2e -- tilemap_runtime_edit
-cargo run -p tilemap_lab --features e2e -- tilemap_isometric_pick
-cargo run -p tilemap_lab --features e2e -- tilemap_large_map
+cargo run -p saddle-world-tilemap-lab --features e2e -- tilemap_smoke
+cargo run -p saddle-world-tilemap-lab --features e2e -- tilemap_runtime_edit
+cargo run -p saddle-world-tilemap-lab --features e2e -- tilemap_isometric_pick
+cargo run -p saddle-world-tilemap-lab --features e2e -- tilemap_large_map
+cargo run -p saddle-world-tilemap-lab --features e2e -- tilemap_custom_path_policy
 ```
 
 ## BRP

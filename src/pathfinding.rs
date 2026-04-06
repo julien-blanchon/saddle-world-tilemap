@@ -1,4 +1,6 @@
-use crate::{TileCoord, TileLayerId, Tilemap, TilemapOrientation};
+use crate::{
+    TileCell, TileCoord, TileKind, TileLayerId, TileLayerState, Tilemap, TilemapOrientation,
+};
 use std::cmp::Ordering;
 use std::collections::{BTreeMap, BinaryHeap};
 
@@ -37,6 +39,67 @@ impl TilePathOptions {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct TilePathStep<'a> {
+    pub map: &'a Tilemap,
+    pub layer_id: TileLayerId,
+    pub layer: &'a TileLayerState,
+    pub from: TileCoord,
+    pub to: TileCoord,
+    pub from_tile: Option<&'a TileCell>,
+    pub from_kind: Option<&'a TileKind>,
+    pub to_tile: Option<&'a TileCell>,
+    pub to_kind: Option<&'a TileKind>,
+}
+
+pub trait TilePathPolicy {
+    fn is_passable(&self, step: &TilePathStep<'_>) -> bool;
+
+    fn movement_cost(&self, step: &TilePathStep<'_>) -> u32;
+}
+
+#[derive(Debug, Clone, Copy, Default)]
+pub struct TileKindPathPolicy;
+
+impl TilePathPolicy for TileKindPathPolicy {
+    fn is_passable(&self, step: &TilePathStep<'_>) -> bool {
+        matches!(step.to_kind, Some(kind) if kind.collision.is_none())
+    }
+
+    fn movement_cost(&self, step: &TilePathStep<'_>) -> u32 {
+        step.to_kind.map_or(1, |kind| kind.movement_cost as u32)
+    }
+}
+
+pub struct TilePathCallbacks<Passability, Cost> {
+    passability: Passability,
+    movement_cost: Cost,
+}
+
+impl<Passability, Cost> TilePathCallbacks<Passability, Cost> {
+    #[must_use]
+    pub const fn new(passability: Passability, movement_cost: Cost) -> Self {
+        Self {
+            passability,
+            movement_cost,
+        }
+    }
+}
+
+impl<Passability, Cost> TilePathPolicy for TilePathCallbacks<Passability, Cost>
+where
+    Passability: for<'a> Fn(&TilePathStep<'a>) -> bool,
+    Cost: for<'a> Fn(&TilePathStep<'a>) -> u32,
+{
+    fn is_passable(&self, step: &TilePathStep<'_>) -> bool {
+        (self.passability)(step)
+    }
+
+    fn movement_cost(&self, step: &TilePathStep<'_>) -> u32 {
+        (self.movement_cost)(step)
+    }
+}
+
 pub fn find_path(
     map: &Tilemap,
     layer_id: TileLayerId,
@@ -44,6 +107,20 @@ pub fn find_path(
     goal: TileCoord,
     options: &TilePathOptions,
 ) -> Option<TilePathResult> {
+    find_path_with_policy(map, layer_id, start, goal, options, &TileKindPathPolicy)
+}
+
+pub fn find_path_with_policy<P>(
+    map: &Tilemap,
+    layer_id: TileLayerId,
+    start: TileCoord,
+    goal: TileCoord,
+    options: &TilePathOptions,
+    policy: &P,
+) -> Option<TilePathResult>
+where
+    P: TilePathPolicy + ?Sized,
+{
     if start == goal {
         return Some(TilePathResult {
             path: vec![start],
@@ -72,18 +149,8 @@ pub fn find_path(
 
         let neighbors = tile_neighbors(map, current.coord, options.diagonal);
         for neighbor in neighbors {
-            let neighbor_cost = layer
-                .get_tile(map.chunk_size, neighbor)
-                .and_then(|cell| layer.catalog.kind(cell.kind))
-                .map(|kind| {
-                    if kind.collision.is_some() {
-                        return None;
-                    }
-                    Some(kind.movement_cost as u32)
-                })
-                .unwrap_or(None);
-
-            let Some(move_cost) = neighbor_cost else {
+            let Some(move_cost) = step_cost(map, layer_id, layer, current.coord, neighbor, policy)
+            else {
                 continue;
             };
 
@@ -114,6 +181,27 @@ pub fn reachable_tiles(
     max_cost: u32,
     diagonal: bool,
 ) -> BTreeMap<TileCoord, u32> {
+    reachable_tiles_with_policy(
+        map,
+        layer_id,
+        start,
+        max_cost,
+        diagonal,
+        &TileKindPathPolicy,
+    )
+}
+
+pub fn reachable_tiles_with_policy<P>(
+    map: &Tilemap,
+    layer_id: TileLayerId,
+    start: TileCoord,
+    max_cost: u32,
+    diagonal: bool,
+    policy: &P,
+) -> BTreeMap<TileCoord, u32>
+where
+    P: TilePathPolicy + ?Sized,
+{
     let Some(layer) = map.layers.get(&layer_id) else {
         return BTreeMap::new();
     };
@@ -134,18 +222,8 @@ pub fn reachable_tiles(
 
         let neighbors = tile_neighbors(map, current.coord, diagonal);
         for neighbor in neighbors {
-            let neighbor_cost = layer
-                .get_tile(map.chunk_size, neighbor)
-                .and_then(|cell| layer.catalog.kind(cell.kind))
-                .map(|kind| {
-                    if kind.collision.is_some() {
-                        return None;
-                    }
-                    Some(kind.movement_cost as u32)
-                })
-                .unwrap_or(None);
-
-            let Some(move_cost) = neighbor_cost else {
+            let Some(move_cost) = step_cost(map, layer_id, layer, current.coord, neighbor, policy)
+            else {
                 continue;
             };
 
@@ -166,6 +244,38 @@ pub fn reachable_tiles(
     }
 
     costs
+}
+
+fn step_cost<P>(
+    map: &Tilemap,
+    layer_id: TileLayerId,
+    layer: &TileLayerState,
+    from: TileCoord,
+    to: TileCoord,
+    policy: &P,
+) -> Option<u32>
+where
+    P: TilePathPolicy + ?Sized,
+{
+    let from_tile = layer.get_tile(map.chunk_size, from);
+    let from_kind = from_tile.and_then(|cell| layer.catalog.kind(cell.kind));
+    let to_tile = layer.get_tile(map.chunk_size, to);
+    let to_kind = to_tile.and_then(|cell| layer.catalog.kind(cell.kind));
+    let step = TilePathStep {
+        map,
+        layer_id,
+        layer,
+        from,
+        to,
+        from_tile,
+        from_kind,
+        to_tile,
+        to_kind,
+    };
+
+    policy
+        .is_passable(&step)
+        .then(|| policy.movement_cost(&step))
 }
 
 fn tile_neighbors(map: &Tilemap, coord: TileCoord, diagonal: bool) -> Vec<TileCoord> {

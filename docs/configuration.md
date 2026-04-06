@@ -280,6 +280,56 @@ Result of a successful pathfinding query.
 - `path: Vec<TileCoord>` — ordered tile coordinates from start to goal (inclusive)
 - `total_cost: u32` — accumulated movement cost along the path
 
+## `TileKindPathPolicy`
+
+Built-in pathfinding policy used by `find_path(...)` and `reachable_tiles(...)`.
+
+### Behavior
+
+- destination tiles must exist on the queried layer
+- same-layer tiles with `TileCollisionDescriptor` are impassable
+- same-layer `TileKind.movement_cost` is used as the per-step cost
+
+### Guidance
+
+- use this when the queried layer already contains the locomotion metadata you want
+- switch to `find_path_with_policy(...)` or `reachable_tiles_with_policy(...)` when movement depends on other layers or agent-specific rules
+
+## `TilePathStep<'a>`
+
+Context passed into custom `TilePathPolicy` implementations and `TilePathCallbacks`.
+
+### Fields
+
+- `map: &Tilemap`
+- `layer_id: TileLayerId`
+- `layer: &TileLayerState`
+- `from: TileCoord`
+- `to: TileCoord`
+- `from_tile: Option<&TileCell>`
+- `from_kind: Option<&TileKind>`
+- `to_tile: Option<&TileCell>`
+- `to_kind: Option<&TileKind>`
+
+### Guidance
+
+- inspect `to_kind` / `to_tile` for same-layer terrain decisions
+- inspect `map` when passability or cost depends on other layers
+- prefer positive movement costs for passable tiles
+
+## `TilePathCallbacks`
+
+Closure adapter for custom pathfinding rules.
+
+### Constructor
+
+- `TilePathCallbacks::new(passability, movement_cost)`
+
+### Guidance
+
+- use this for one-off closures in examples, tools, or gameplay systems
+- implement `TilePathPolicy` directly for reusable agent types or locomotion presets
+
 ## `TiledImportOptions`
 
 Runtime import surface for normalized Tiled JSON ingestion.

@@ -3,10 +3,12 @@ use saddle_world_tilemap_example_support as support;
 use bevy::prelude::*;
 use saddle_pane::prelude::*;
 use saddle_world_tilemap::{
-    TileCell, TileCoord, TilePathOptions, TilemapCommand, TilemapDebugOverlay,
-    TilemapDebugSettings, TilemapPlugin, find_path,
+    TileCell, TileCoord, TilePathCallbacks, TilePathOptions, TilePathStep, TilemapCommand,
+    TilemapDebugOverlay, TilemapDebugSettings, TilemapPlugin, find_path_with_policy,
 };
-use support::{COLLISION_LAYER, DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, OverlayText};
+use support::{
+    COLLISION_LAYER, DETAIL_LAYER, DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, OverlayText,
+};
 
 const VILLAGE_SIZE: UVec2 = UVec2::new(32, 24);
 
@@ -17,6 +19,7 @@ struct VillageDemo {
     path_start: Option<TileCoord>,
     path_end: Option<TileCoord>,
     current_path: Vec<TileCoord>,
+    current_path_cost: Option<u32>,
     npc_positions: Vec<TileCoord>,
 }
 
@@ -88,6 +91,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         path_start: None,
         path_end: None,
         current_path: Vec::new(),
+        current_path_cost: None,
         npc_positions,
     });
 }
@@ -138,10 +142,28 @@ fn update_pathfinding(
             });
         }
         demo.current_path.clear();
+        demo.current_path_cost = None;
 
         if let (Some(start), Some(end)) = (demo.path_start, demo.path_end) {
             let options = TilePathOptions::default().with_diagonal(false);
-            if let Some(result) = find_path(map, GROUND_LAYER, start, end, &options) {
+            let road_kind = demo.palette.tiles.road;
+            let policy = TilePathCallbacks::new(
+                |step: &TilePathStep<'_>| step.map.get_tile(COLLISION_LAYER, step.to).is_none(),
+                |step: &TilePathStep<'_>| {
+                    if step
+                        .map
+                        .get_tile(DETAIL_LAYER, step.to)
+                        .is_some_and(|tile| tile.kind == road_kind)
+                    {
+                        1
+                    } else {
+                        step.to_kind.map_or(1, |kind| kind.movement_cost as u32)
+                    }
+                },
+            );
+            if let Some(result) =
+                find_path_with_policy(map, GROUND_LAYER, start, end, &options, &policy)
+            {
                 for coord in &result.path {
                     commands_out.write(TilemapCommand::SetTile {
                         map: demo.map,
@@ -150,6 +172,7 @@ fn update_pathfinding(
                         tile: TileCell::new(demo.palette.tiles.square_highlight),
                     });
                 }
+                demo.current_path_cost = Some(result.total_cost);
                 demo.current_path = result.path;
             }
         }
@@ -170,12 +193,13 @@ fn update_pathfinding(
     overlay.0 = format!(
         "RPG Village — Left-click: path start, Right-click: path end\n\
         Hover: {}  Start: {}  End: {}\n\
-        Path length: {} tiles  Chunks: {}\n\
+        Path length: {} tiles  Total cost: {}  Chunks: {}\n\
         NPCs: {} wandering the village",
         hover_str,
         start_str,
         end_str,
         demo.current_path.len(),
+        demo.current_path_cost.map_or(0, |cost| cost),
         diagnostics.logical_chunks_total,
         demo.npc_positions.len(),
     );

@@ -47,7 +47,10 @@ pub use layer::{
     TileCatalog, TileCell, TileKind, TileKindId, TileLayerConfig, TileLayerId,
     TileLayerRenderConfig, TileLayerState, TileOrientation, TileRenderRule, TileVisual, Tilemap,
 };
-pub use pathfinding::{TilePathOptions, TilePathResult, find_path, reachable_tiles};
+pub use pathfinding::{
+    TileKindPathPolicy, TilePathCallbacks, TilePathOptions, TilePathPolicy, TilePathResult,
+    TilePathStep, find_path, find_path_with_policy, reachable_tiles, reachable_tiles_with_policy,
+};
 
 #[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub enum TilemapSystems {

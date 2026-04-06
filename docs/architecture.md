@@ -154,14 +154,23 @@ The crate includes two standalone pathfinding functions that operate directly on
 - `find_path` — A* search on a named tile layer, returning the optimal path as a `Vec<TileCoord>` with total accumulated cost
 - `reachable_tiles` — Dijkstra flood from a starting tile, returning all tiles reachable within a cost budget
 
+Both are convenience wrappers over:
+
+- `find_path_with_policy`
+- `reachable_tiles_with_policy`
+- `TilePathPolicy`
+- `TilePathStep`
+- `TilePathCallbacks`
+
 Both functions:
 
 - read tile data from `TileLayerState` without spawning entities
-- treat tiles with a `TileCollisionDescriptor` as impassable
-- use `TileKind.movement_cost` as the per-tile cost
+- require the destination tile to exist on the queried layer under the built-in policy
+- default to `TileKindPathPolicy`, which treats same-layer `TileCollisionDescriptor` tiles as impassable
+- default to `TileKind.movement_cost` as the per-tile cost
 - support all orientation modes through `tile_neighbors()`, which dispatches to cardinal, 8-directional, or hex-6 neighborhoods based on `TilemapOrientation`
 
-Empty tiles (no data) are passable with an implicit cost of 1.
+Custom policies receive a `TilePathStep` containing the current map, the queried layer, source and destination coordinates, and the resolved source/destination tile metadata for that layer. This allows callers to implement richer locomotion models, such as consulting a separate collision layer, detail-layer roads, or agent-specific movement rules, without changing the logical tile storage.
 
 ### Design choice
 

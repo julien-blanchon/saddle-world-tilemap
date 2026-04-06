@@ -151,11 +151,24 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
 ### Pathfinding
 
 - `find_path(map, layer_id, start, goal, options) -> Option<TilePathResult>` — A* search on a tile layer, respecting movement costs and collision
+- `find_path_with_policy(map, layer_id, start, goal, options, policy) -> Option<TilePathResult>` — A* with injectable passability and cost policy
 - `reachable_tiles(map, layer_id, start, max_cost, diagonal) -> BTreeMap<TileCoord, u32>` — Dijkstra flood returning all tiles reachable within a cost budget
+- `reachable_tiles_with_policy(map, layer_id, start, max_cost, diagonal, policy) -> BTreeMap<TileCoord, u32>` — Dijkstra flood with injectable passability and cost policy
 - `TilePathOptions` — configuration: `max_cost`, `diagonal`
 - `TilePathResult` — result: `path: Vec<TileCoord>`, `total_cost: u32`
+- `TilePathPolicy` — trait hook for custom traversal rules
+- `TilePathStep` — per-edge query context passed into custom policies
+- `TilePathCallbacks::new(passability, movement_cost)` — convenience adapter from closures
+- `TileKindPathPolicy` — built-in policy used by `find_path` and `reachable_tiles`
 
-Pathfinding supports all orientation modes (square, isometric, hex). Tiles with a `TileCollisionDescriptor` are treated as impassable. Movement cost comes from `TileKind.movement_cost`.
+Pathfinding supports all orientation modes (square, isometric, hex). `find_path` and `reachable_tiles` keep the existing built-in behavior through `TileKindPathPolicy`: the destination tile must exist on the queried layer, same-layer `TileCollisionDescriptor` blocks traversal, and `TileKind.movement_cost` supplies the per-step cost.
+
+Use `*_with_policy` when locomotion depends on different rules, such as:
+
+- reading a separate collision layer
+- preferring roads from a detail layer
+- agent-specific movement rules
+- directional or contextual terrain costs
 
 ### Fill helpers
 
@@ -225,7 +238,7 @@ Tile edits mark dirty chunks. The runtime then resolves only the affected chunks
 | `layered_map` | layer visibility toggles over ground, detail, and logic-only layers |
 | `isometric` | isometric world-to-tile picking and movement-cost metadata |
 | `hex_strategy` | hex board rendering through tilemap plus `saddle-world-hex-grid` pathfinding |
-| `rpg_village` | top-down RPG village with A* pathfinding, buildings, roads, water, and fences |
+| `rpg_village` | top-down RPG village with custom A* policy that avoids collision-layer walls and prefers detail-layer roads |
 | `platformer` | side-scrolling platformer with gravity, collision layer, and platform jumping |
 | `tile_painter` | runtime tile editor with pencil, line, circle, flood fill, and eraser brush modes |
 | `roguelike_showcase` | P0 integration demo layering `saddle-procgen-dungeon-gen`, `saddle-ai-fov`, and `saddle-world-fog-of-war` onto a playable tilemap dungeon |

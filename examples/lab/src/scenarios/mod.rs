@@ -4,7 +4,10 @@ use bevy::prelude::*;
 use saddle_bevy_e2e::{action::Action, actions::assertions, scenario::Scenario};
 
 use crate::{CameraFocus, LabControl};
-use saddle_world_tilemap::{TileCoord, TilePathOptions, find_path, reachable_tiles};
+use saddle_world_tilemap::{
+    TileCoord, TilePathCallbacks, TilePathOptions, TilePathStep, find_path,
+    find_path_with_policy, reachable_tiles, reachable_tiles_with_policy,
+};
 
 pub fn list_scenarios() -> Vec<&'static str> {
     vec![
@@ -14,6 +17,7 @@ pub fn list_scenarios() -> Vec<&'static str> {
         "tilemap_isometric_pick",
         "tilemap_large_map",
         "tilemap_pathfinding",
+        "tilemap_custom_path_policy",
     ]
 }
 
@@ -25,6 +29,7 @@ pub fn scenario_by_name(name: &str) -> Option<Scenario> {
         "tilemap_isometric_pick" => Some(tilemap_isometric_pick()),
         "tilemap_large_map" => Some(tilemap_large_map()),
         "tilemap_pathfinding" => Some(tilemap_pathfinding()),
+        "tilemap_custom_path_policy" => Some(tilemap_custom_path_policy()),
         _ => None,
     }
 }
@@ -252,5 +257,68 @@ fn tilemap_pathfinding() -> Scenario {
         .then(Action::Screenshot("pathfinding".into()))
         .then(Action::WaitFrames(1))
         .then(assertions::log_summary("tilemap_pathfinding"))
+        .build()
+}
+
+fn tilemap_custom_path_policy() -> Scenario {
+    use saddle_world_tilemap_example_support::{COLLISION_LAYER, GROUND_LAYER};
+
+    Scenario::builder("tilemap_custom_path_policy")
+        .description("Run pathfinding with an injected traversal policy that reads the collision layer, verifying the generic callbacks can block tiles independently from the queried ground layer.")
+        .then(wait_for_diagnostics("maps ready", |diagnostics| {
+            diagnostics.large_total_chunks >= 64
+        }))
+        .then(Action::Custom(Box::new(|world: &mut World| {
+            let mut query = world.query::<(&Name, &saddle_world_tilemap::Tilemap)>();
+            let (_, map) = query
+                .iter(world)
+                .find(|(name, _)| name.as_str() == "Square Showcase Map")
+                .expect("Square Showcase Map entity must exist");
+
+            let start = TileCoord::new(15, 7);
+            let goal = TileCoord::new(19, 7);
+            let options = TilePathOptions::default().with_diagonal(false);
+
+            let default = find_path(map, GROUND_LAYER, start, goal, &options)
+                .expect("default path should exist on the ground layer");
+            assert!(
+                default
+                    .path
+                    .iter()
+                    .any(|coord| (16..=18).contains(&coord.x) && (6..=8).contains(&coord.y)),
+                "default policy should ignore the separate collision layer"
+            );
+
+            let policy = TilePathCallbacks::new(
+                |step: &TilePathStep<'_>| step.map.get_tile(COLLISION_LAYER, step.to).is_none(),
+                |step: &TilePathStep<'_>| step.to_kind.map_or(1, |kind| kind.movement_cost as u32),
+            );
+            let custom = find_path_with_policy(map, GROUND_LAYER, start, goal, &options, &policy)
+                .expect("custom policy should route around the rock enclosure");
+            assert!(
+                !custom
+                    .path
+                    .iter()
+                    .any(|coord| (16..=18).contains(&coord.x) && (6..=8).contains(&coord.y)),
+                "custom policy should avoid the collision-layer blockers"
+            );
+
+            let reachable =
+                reachable_tiles_with_policy(map, GROUND_LAYER, TileCoord::new(15, 7), 8, false, &policy);
+            assert!(
+                !reachable.contains_key(&TileCoord::new(16, 7)),
+                "reachable tiles should also respect the injected blocker policy"
+            );
+
+            info!(
+                "Custom path policy scenario passed: default_len={}, custom_len={}, reachable={}",
+                default.path.len(),
+                custom.path.len(),
+                reachable.len()
+            );
+        })))
+        .then(Action::Screenshot("custom_path_policy".into()))
+        .then(Action::WaitFrames(1))
+        .then(assertions::log_summary("tilemap_custom_path_policy"))
         .build()
 }
