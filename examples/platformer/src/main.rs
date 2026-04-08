@@ -1,3 +1,6 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
@@ -15,17 +18,32 @@ struct PlatformerDemo {
     map: Entity,
     player_coord: TileCoord,
     palette: DemoPalette,
+    horizontal_remainder: f32,
     velocity_y: f32,
+    vertical_remainder: f32,
     grounded: bool,
 }
 
+#[derive(Resource, Default)]
+struct PlatformerAutomation {
+    horizontal_axis: i32,
+    jump_requested: bool,
+}
+
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum PlatformerSystems {
+    Drive,
+}
+
 fn main() {
-    App::new()
-        .insert_resource(support::TilemapExamplePane {
+    let mut app = App::new();
+
+    app.insert_resource(support::TilemapExamplePane {
             debug_enabled: false,
             draw_chunk_bounds: false,
             ..default()
         })
+        .insert_resource(PlatformerAutomation::default())
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -46,12 +64,22 @@ fn main() {
             }),
         )
         .register_pane::<support::TilemapExamplePane>()
+        .configure_sets(Update, PlatformerSystems::Drive)
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (support::sync_example_pane, player_movement, update_overlay),
-        )
-        .run();
+            (
+                support::sync_example_pane,
+                player_movement,
+                update_overlay,
+            )
+                .chain()
+                .in_set(PlatformerSystems::Drive),
+        );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::PlatformerExampleE2EPlugin);
+
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -76,13 +104,15 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         TilemapDebugOverlay::default(),
     );
 
-    let start = TileCoord::new(3, 17);
+    let start = TileCoord::new(3, LEVEL_HEIGHT - 3);
 
     commands.insert_resource(PlatformerDemo {
         map: map_entity,
         player_coord: start,
         palette,
+        horizontal_remainder: 0.0,
         velocity_y: 0.0,
+        vertical_remainder: 0.0,
         grounded: false,
     });
 }
@@ -90,6 +120,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
 fn player_movement(
     time: Res<Time>,
     keys: Res<ButtonInput<KeyCode>>,
+    mut automation: ResMut<PlatformerAutomation>,
     mut demo: ResMut<PlatformerDemo>,
     map_query: Query<&saddle_world_tilemap::Tilemap>,
     mut commands_out: MessageWriter<TilemapCommand>,
@@ -98,54 +129,64 @@ fn player_movement(
         return;
     };
 
-    let gravity = 15.0;
-    let jump_speed = -6.0;
+    let gravity = 28.0;
+    let horizontal_speed = 8.0;
+    let jump_speed = -18.0;
 
-    let mut dx = 0;
-    if keys.just_pressed(KeyCode::ArrowRight) || keys.just_pressed(KeyCode::KeyD) {
-        dx = 1;
-    }
-    if keys.just_pressed(KeyCode::ArrowLeft) || keys.just_pressed(KeyCode::KeyA) {
-        dx = -1;
-    }
+    let keyboard_axis = (keys.pressed(KeyCode::ArrowRight) || keys.pressed(KeyCode::KeyD)) as i32
+        - (keys.pressed(KeyCode::ArrowLeft) || keys.pressed(KeyCode::KeyA)) as i32;
+    let horizontal_axis = if automation.horizontal_axis != 0 {
+        automation.horizontal_axis.clamp(-1, 1)
+    } else {
+        keyboard_axis
+    };
+    let jump_requested = automation.jump_requested || keys.just_pressed(KeyCode::Space);
+    automation.jump_requested = false;
 
     let below = demo.player_coord.offset(0, 1);
     let is_solid_below = is_solid_tile(map, below);
-    demo.grounded = is_solid_below;
+    let mut grounded = is_solid_below;
+    let mut velocity_y = demo.velocity_y;
+    let mut vertical_remainder = demo.vertical_remainder;
 
-    if keys.just_pressed(KeyCode::Space) && demo.grounded {
-        demo.velocity_y = jump_speed;
+    if grounded && velocity_y > 0.0 {
+        velocity_y = 0.0;
+        vertical_remainder = 0.0;
     }
 
-    demo.velocity_y += gravity * time.delta_secs();
-    let dy = if demo.velocity_y > 1.0 {
-        demo.velocity_y = 0.0;
-        1
-    } else if demo.velocity_y < -1.0 {
-        demo.velocity_y = 0.0;
-        -1
-    } else {
-        0
-    };
+    if jump_requested && grounded {
+        velocity_y = jump_speed;
+        vertical_remainder = 0.0;
+        grounded = false;
+    }
+
+    demo.horizontal_remainder += horizontal_axis as f32 * horizontal_speed * time.delta_secs();
+    velocity_y += gravity * time.delta_secs();
+    vertical_remainder += velocity_y * time.delta_secs();
 
     let old = demo.player_coord;
     let mut new_coord = old;
 
-    if dx != 0 {
-        let candidate = old.offset(dx, 0);
-        if !is_solid_tile(map, candidate) && in_level_bounds(&candidate) {
-            new_coord.x = candidate.x;
-        }
-    }
-
-    if dy != 0 {
-        let candidate = new_coord.offset(0, dy);
-        if !is_solid_tile(map, candidate) && in_level_bounds(&candidate) {
-            new_coord.y = candidate.y;
-        } else {
-            demo.velocity_y = 0.0;
-        }
-    }
+    apply_axis_steps(
+        &mut new_coord,
+        take_whole_steps(&mut demo.horizontal_remainder),
+        IVec2::X,
+        map,
+        &mut demo.horizontal_remainder,
+        None,
+    );
+    apply_axis_steps(
+        &mut new_coord,
+        take_whole_steps(&mut vertical_remainder),
+        IVec2::Y,
+        map,
+        &mut vertical_remainder,
+        Some((&mut velocity_y, &mut grounded)),
+    );
+    demo.player_coord = new_coord;
+    demo.grounded = is_solid_tile(map, demo.player_coord.offset(0, 1));
+    demo.velocity_y = velocity_y;
+    demo.vertical_remainder = vertical_remainder;
 
     if new_coord != old {
         commands_out.write(TilemapCommand::ClearTile {
@@ -159,7 +200,6 @@ fn player_movement(
             coord: new_coord,
             tile: TileCell::new(demo.palette.tiles.square_highlight),
         });
-        demo.player_coord = new_coord;
     }
 }
 
@@ -186,6 +226,52 @@ fn is_solid_tile(map: &saddle_world_tilemap::Tilemap, coord: TileCoord) -> bool 
 
 fn in_level_bounds(coord: &TileCoord) -> bool {
     coord.x >= 0 && coord.y >= 0 && coord.x < LEVEL_WIDTH && coord.y < LEVEL_HEIGHT
+}
+
+fn take_whole_steps(remainder: &mut f32) -> i32 {
+    let mut steps = 0;
+
+    while *remainder >= 1.0 {
+        *remainder -= 1.0;
+        steps += 1;
+    }
+    while *remainder <= -1.0 {
+        *remainder += 1.0;
+        steps -= 1;
+    }
+
+    steps
+}
+
+fn apply_axis_steps(
+    coord: &mut TileCoord,
+    steps: i32,
+    axis: IVec2,
+    map: &saddle_world_tilemap::Tilemap,
+    remainder: &mut f32,
+    vertical_state: Option<(&mut f32, &mut bool)>,
+) {
+    if steps == 0 {
+        return;
+    }
+
+    let direction = steps.signum();
+    let mut vertical_state = vertical_state;
+    for _ in 0..steps.unsigned_abs() {
+        let candidate = coord.offset(axis.x * direction, axis.y * direction);
+        if !in_level_bounds(&candidate) || is_solid_tile(map, candidate) {
+            *remainder = 0.0;
+            if let Some((velocity_y, grounded)) = &mut vertical_state {
+                **velocity_y = 0.0;
+                if direction > 0 {
+                    **grounded = true;
+                }
+            }
+            break;
+        }
+
+        *coord = candidate;
+    }
 }
 
 fn build_platformer_level(palette: &DemoPalette) -> saddle_world_tilemap::Tilemap {

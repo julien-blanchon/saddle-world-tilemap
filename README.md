@@ -227,6 +227,8 @@ The important separation is:
 
 Tile edits mark dirty chunks. The runtime then resolves only the affected chunks and rebuilds only the render and collision surfaces that changed. `TilemapDiagnostics::dirty_chunks` reports distinct dirty chunk coordinates across resolve, render, and collision phases instead of double-counting the same chunk in multiple queues.
 
+When render asset resources are absent, the logical, animation, autotile, collision, and pathfinding phases still run. Render chunk sync is skipped automatically so the same plugin can stay active in logic-only tools, headless sims, or server-side validation passes.
+
 ## Examples
 
 | Example | Focus |
@@ -237,11 +239,11 @@ Tile edits mark dirty chunks. The runtime then resolves only the affected chunks
 | `animated_tiles` | definition-driven animated water and rebuild counters |
 | `layered_map` | layer visibility toggles over ground, detail, and logic-only layers |
 | `isometric` | isometric world-to-tile picking and movement-cost metadata |
-| `hex_strategy` | hex board rendering through tilemap plus `saddle-world-hex-grid` pathfinding |
+| `hex_strategy` | hex board rendering through tilemap plus `saddle-world-hex-grid` pathfinding with stable route preview updates |
 | `rpg_village` | top-down RPG village with custom A* policy that avoids collision-layer walls and prefers detail-layer roads |
-| `platformer` | side-scrolling platformer with gravity, collision layer, and platform jumping |
-| `tile_painter` | runtime tile editor with pencil, line, circle, flood fill, and eraser brush modes |
-| `roguelike_showcase` | P0 integration demo layering `saddle-procgen-dungeon-gen`, `saddle-ai-fov`, and `saddle-world-fog-of-war` onto a playable tilemap dungeon |
+| `platformer` | side-scrolling platformer with hold-to-run movement, collision, and a jump tuned to reach the authored platforms |
+| `tile_painter` | runtime tile editor with pencil, line, circle, flood fill, and eraser brush modes; the default soil brush contrasts against the grass canvas immediately |
+| `roguelike_showcase` | P0 integration demo layering `saddle-procgen-dungeon-gen`, `saddle-ai-fov`, and `saddle-world-fog-of-war` onto a playable tilemap dungeon with movement/fog E2E coverage |
 | `saddle-world-tilemap-lab` | crate-local BRP/E2E lab covering smoke, runtime edits, isometric picks, large-map sweeps, pathfinding, and manual debug controls |
 
 Every shipped example now includes a live `saddle-pane` control surface for debug toggles and the most useful layout parameters.
@@ -267,6 +269,16 @@ Smoke-check the integration showcase with:
 
 ```bash
 cargo run -p saddle-world-tilemap-example-roguelike-showcase --features e2e -- roguelike_showcase_smoke
+```
+
+Targeted interaction checks for the currently scripted examples:
+
+```bash
+cargo run -p saddle-world-tilemap-example-platformer --features e2e -- platformer_first_platform
+cargo run -p saddle-world-tilemap-example-hex-strategy --features e2e -- hex_strategy_path_preview
+cargo run -p saddle-world-tilemap-example-tile-painter --features e2e -- tile_painter_paint_and_erase
+cargo run -p saddle-world-tilemap-example-roguelike-showcase --features e2e -- roguelike_showcase_explore_fog
+cargo run -p saddle-world-tilemap-example-roguelike-showcase --features e2e -- roguelike_showcase_move_and_regenerate
 ```
 
 ## Dependency philosophy

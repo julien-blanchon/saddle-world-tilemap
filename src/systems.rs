@@ -1,9 +1,10 @@
 use crate::{
-    ChunkRebuilt, LayerVisibilityChanged, TileAnimationLooped, TileChanged, TileCollisionCell,
-    TileLayerId, Tilemap, TilemapCollisionChunk, TilemapCommand, TilemapDiagnostics,
-    TilemapLayerNode, TilemapRenderChunk,
+    ChunkRebuilt, LayerVisibilityChanged, TileAnimationLooped, TileCell, TileChanged,
+    TileCollisionCell, TileLayerId, Tilemap, TilemapCollisionChunk, TilemapCommand,
+    TilemapDiagnostics, TilemapLayerNode, TilemapRenderChunk,
     animation::TileAnimationRuntimeState,
     chunk::{ResolvedTileVisual, TileChunk},
+    layer::{bresenham_line, fill_circle_coords, flood_fill_coords},
     rendering::{
         TilemapRuntimeComponent, build_chunk_mesh, build_color_material, chunk_local_translation,
         multiply_colors, resolve_static_visual,
@@ -47,6 +48,13 @@ pub(crate) fn deactivate_runtime(
 
 pub(crate) fn runtime_is_active(runtime: Res<TilemapRuntimeControl>) -> bool {
     runtime.active
+}
+
+pub(crate) fn render_backend_is_available(
+    meshes: Option<Res<Assets<Mesh>>>,
+    materials: Option<Res<Assets<ColorMaterial>>>,
+) -> bool {
+    meshes.is_some() && materials.is_some()
 }
 
 pub(crate) fn prepare_maps(
@@ -147,35 +155,35 @@ pub(crate) fn apply_commands(
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                let previous_kind = tilemap
-                    .get_tile(*layer, *coord)
-                    .map(|existing| existing.kind);
+                let previous_tile = tilemap.get_tile(*layer, *coord).cloned();
                 tilemap.set_tile(*layer, *coord, tile.clone());
-                diagnostics.tile_edits_this_frame += 1;
-                changed.write(TileChanged {
-                    map: *map,
-                    layer: *layer,
-                    coord: *coord,
-                    previous_kind,
-                    next_kind: Some(tile.kind),
-                });
+                let next_tile = tilemap.get_tile(*layer, *coord).cloned();
+                record_tile_change(
+                    &mut changed,
+                    &mut diagnostics,
+                    *map,
+                    *layer,
+                    *coord,
+                    previous_tile,
+                    next_tile,
+                );
             }
             TilemapCommand::ClearTile { map, layer, coord } => {
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                let previous_kind = tilemap
-                    .get_tile(*layer, *coord)
-                    .map(|existing| existing.kind);
+                let previous_tile = tilemap.get_tile(*layer, *coord).cloned();
                 tilemap.clear_tile(*layer, *coord);
-                diagnostics.tile_edits_this_frame += 1;
-                changed.write(TileChanged {
-                    map: *map,
-                    layer: *layer,
-                    coord: *coord,
-                    previous_kind,
-                    next_kind: None,
-                });
+                let next_tile = tilemap.get_tile(*layer, *coord).cloned();
+                record_tile_change(
+                    &mut changed,
+                    &mut diagnostics,
+                    *map,
+                    *layer,
+                    *coord,
+                    previous_tile,
+                    next_tile,
+                );
             }
             TilemapCommand::FillRect {
                 map,
@@ -186,52 +194,44 @@ pub(crate) fn apply_commands(
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                for coord in rect.iter() {
-                    let previous_kind = tilemap
-                        .get_tile(*layer, coord)
-                        .map(|existing| existing.kind);
-                    tilemap.set_tile(*layer, coord, tile.clone());
-                    diagnostics.tile_edits_this_frame += 1;
-                    changed.write(TileChanged {
-                        map: *map,
-                        layer: *layer,
-                        coord,
-                        previous_kind,
-                        next_kind: Some(tile.kind),
-                    });
-                }
+                apply_tile_batch(
+                    &mut tilemap,
+                    &mut diagnostics,
+                    &mut changed,
+                    *map,
+                    *layer,
+                    rect.iter(),
+                    tile,
+                );
             }
             TilemapCommand::SwapTiles { map, layer, a, b } => {
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                let previous_a = tilemap.get_tile(*layer, *a).map(|existing| existing.kind);
-                let previous_b = tilemap.get_tile(*layer, *b).map(|existing| existing.kind);
+                let previous_a = tilemap.get_tile(*layer, *a).cloned();
+                let previous_b = tilemap.get_tile(*layer, *b).cloned();
                 tilemap.swap_tiles(*layer, *a, *b);
-                let next_a = tilemap.get_tile(*layer, *a).map(|existing| existing.kind);
-                let next_b = tilemap.get_tile(*layer, *b).map(|existing| existing.kind);
+                let next_a = tilemap.get_tile(*layer, *a).cloned();
+                let next_b = tilemap.get_tile(*layer, *b).cloned();
 
-                if previous_a != next_a {
-                    diagnostics.tile_edits_this_frame += 1;
-                    changed.write(TileChanged {
-                        map: *map,
-                        layer: *layer,
-                        coord: *a,
-                        previous_kind: previous_a,
-                        next_kind: next_a,
-                    });
-                }
-
-                if previous_b != next_b {
-                    diagnostics.tile_edits_this_frame += 1;
-                    changed.write(TileChanged {
-                        map: *map,
-                        layer: *layer,
-                        coord: *b,
-                        previous_kind: previous_b,
-                        next_kind: next_b,
-                    });
-                }
+                record_tile_change(
+                    &mut changed,
+                    &mut diagnostics,
+                    *map,
+                    *layer,
+                    *a,
+                    previous_a,
+                    next_a,
+                );
+                record_tile_change(
+                    &mut changed,
+                    &mut diagnostics,
+                    *map,
+                    *layer,
+                    *b,
+                    previous_b,
+                    next_b,
+                );
             }
             TilemapCommand::SetLayerVisibility {
                 map,
@@ -258,8 +258,15 @@ pub(crate) fn apply_commands(
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                tilemap.fill_circle(*layer, *center, *radius, tile.clone());
-                diagnostics.tile_edits_this_frame += 1;
+                apply_tile_batch(
+                    &mut tilemap,
+                    &mut diagnostics,
+                    &mut changed,
+                    *map,
+                    *layer,
+                    fill_circle_coords(*center, *radius),
+                    tile,
+                );
             }
             TilemapCommand::FillLine {
                 map,
@@ -271,8 +278,15 @@ pub(crate) fn apply_commands(
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                tilemap.fill_line(*layer, *from, *to, tile.clone());
-                diagnostics.tile_edits_this_frame += 1;
+                apply_tile_batch(
+                    &mut tilemap,
+                    &mut diagnostics,
+                    &mut changed,
+                    *map,
+                    *layer,
+                    bresenham_line(*from, *to),
+                    tile,
+                );
             }
             TilemapCommand::FloodFill {
                 map,
@@ -284,8 +298,16 @@ pub(crate) fn apply_commands(
                 let Ok((mut tilemap, mut diagnostics)) = maps.get_mut(*map) else {
                     continue;
                 };
-                let filled = tilemap.flood_fill(*layer, *start, tile.clone(), *max_tiles);
-                diagnostics.tile_edits_this_frame += filled;
+                let coords = flood_fill_coords(&tilemap, *layer, *start, tile.kind, *max_tiles);
+                apply_tile_batch(
+                    &mut tilemap,
+                    &mut diagnostics,
+                    &mut changed,
+                    *map,
+                    *layer,
+                    coords,
+                    tile,
+                );
             }
         }
     }
@@ -490,7 +512,6 @@ pub(crate) fn sync_collision_chunks(
                     });
 
                 commands.entity(*entity).insert(collision_chunk);
-                diagnostics.collision_chunks_total += 1;
                 rebuilt.write(ChunkRebuilt {
                     map: map_entity,
                     layer: layer_id,
@@ -504,6 +525,8 @@ pub(crate) fn sync_collision_chunks(
                 layer.dirty_collision.clear();
             }
         }
+
+        diagnostics.collision_chunks_total = runtime_component.0.collision_chunks.len();
     }
 }
 
@@ -773,6 +796,56 @@ fn resolve_chunk_snapshot(
         collisions,
         animated_kinds,
     })
+}
+
+fn apply_tile_batch<I>(
+    tilemap: &mut Tilemap,
+    diagnostics: &mut TilemapDiagnostics,
+    changed: &mut MessageWriter<TileChanged>,
+    map: Entity,
+    layer: TileLayerId,
+    coords: I,
+    tile: &TileCell,
+) where
+    I: IntoIterator<Item = crate::TileCoord>,
+{
+    for coord in coords {
+        let previous_tile = tilemap.get_tile(layer, coord).cloned();
+        tilemap.set_tile(layer, coord, tile.clone());
+        let next_tile = tilemap.get_tile(layer, coord).cloned();
+        record_tile_change(
+            changed,
+            diagnostics,
+            map,
+            layer,
+            coord,
+            previous_tile,
+            next_tile,
+        );
+    }
+}
+
+fn record_tile_change(
+    changed: &mut MessageWriter<TileChanged>,
+    diagnostics: &mut TilemapDiagnostics,
+    map: Entity,
+    layer: TileLayerId,
+    coord: crate::TileCoord,
+    previous_tile: Option<TileCell>,
+    next_tile: Option<TileCell>,
+) {
+    if previous_tile == next_tile {
+        return;
+    }
+
+    diagnostics.tile_edits_this_frame += 1;
+    changed.write(TileChanged {
+        map,
+        layer,
+        coord,
+        previous_kind: previous_tile.map(|tile| tile.kind),
+        next_kind: next_tile.map(|tile| tile.kind),
+    });
 }
 
 #[cfg(test)]

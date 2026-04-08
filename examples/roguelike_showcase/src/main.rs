@@ -198,18 +198,18 @@ fn main() {
         .add_systems(
             Update,
             (
-                support::sync_example_pane,
+                sync_roguelike_example_pane,
                 rebuild_level_if_needed,
                 move_player.before(FovSystems::MarkDirty),
                 sync_player_fov_and_fog.before(FovSystems::MarkDirty),
                 sync_fov_to_fog
                     .after(FovSystems::Recompute)
                     .before(FogOfWarSystems::CollectVisionSources),
-                sync_fog_overlay.after(FogOfWarSystems::UpdateExplorationMemory),
+                sync_fog_overlay.after(FogOfWarSystems::ApplyPersistence),
                 follow_camera,
                 animate_markers,
-                update_overlay.after(FogOfWarSystems::UpdateExplorationMemory),
-                update_monitors.after(FogOfWarSystems::UpdateExplorationMemory),
+                update_overlay.after(FogOfWarSystems::ApplyPersistence),
+                update_monitors.after(FogOfWarSystems::ApplyPersistence),
             ),
         );
 
@@ -707,6 +707,55 @@ fn sync_fog_overlay(
     for mut overlay in &mut overlays {
         if (overlay.edge_softness - pane.fog_edge_softness).abs() > 0.001 {
             overlay.edge_softness = pane.fog_edge_softness;
+        }
+    }
+}
+
+fn sync_roguelike_example_pane(
+    mut pane: ResMut<support::TilemapExamplePane>,
+    mut debug: ResMut<TilemapDebugSettings>,
+    mut maps: Query<&mut Tilemap>,
+) {
+    if !pane.rows_face_up {
+        pane.rows_face_up = true;
+    }
+
+    debug.enabled = pane.debug_enabled;
+    debug.draw_chunk_bounds = pane.draw_chunk_bounds;
+    debug.draw_dirty_chunks = pane.draw_dirty_chunks;
+
+    for mut map in &mut maps {
+        let mut changed = false;
+
+        if map.geometry.row_direction != TileRowDirection::Up {
+            map.geometry.row_direction = TileRowDirection::Up;
+            changed = true;
+        }
+
+        if let Some(detail) = map.layer(DETAIL_LAYER)
+            && detail.config.visible != pane.detail_layer_visible
+        {
+            map.set_layer_visibility(DETAIL_LAYER, pane.detail_layer_visible);
+            changed = true;
+        }
+
+        if let Some(layer) = map.layer_mut(HIGHLIGHT_LAYER)
+            && let Some(render) = layer.config.render.as_mut()
+        {
+            let current = render.tint.to_srgba();
+            if (current.alpha - pane.highlight_alpha).abs() > 0.001 {
+                render.tint = Color::srgba(
+                    current.red,
+                    current.green,
+                    current.blue,
+                    pane.highlight_alpha,
+                );
+                changed = true;
+            }
+        }
+
+        if changed {
+            map.mark_all_dirty();
         }
     }
 }

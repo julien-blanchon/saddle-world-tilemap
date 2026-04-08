@@ -1,9 +1,17 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
 use saddle_pane::prelude::*;
 use saddle_world_tilemap::{TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
 use support::{DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, ISOMETRIC_SIZE, OverlayText};
+
+#[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub enum IsometricSystems {
+    Drive,
+}
 
 #[derive(Resource)]
 struct IsoDemo {
@@ -12,8 +20,14 @@ struct IsoDemo {
     highlight_kind: saddle_world_tilemap::TileKindId,
 }
 
+#[derive(Resource, Default)]
+struct IsoAutomation {
+    hovered_override: Option<TileCoord>,
+}
+
 fn main() {
-    App::new()
+    let mut app = App::new();
+    app.insert_resource(IsoAutomation::default())
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -29,9 +43,15 @@ fn main() {
         .add_plugins(support::pane_plugins())
         .add_plugins(TilemapPlugin::default())
         .register_pane::<support::TilemapExamplePane>()
+        .configure_sets(Update, IsometricSystems::Drive)
         .add_systems(Startup, setup)
-        .add_systems(Update, (support::sync_example_pane, update_pick))
-        .run();
+        .add_systems(
+            Update,
+            (support::sync_example_pane, update_pick).in_set(IsometricSystems::Drive),
+        );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::IsometricExampleE2EPlugin);
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -74,6 +94,7 @@ fn update_pick(
     camera: Single<(&Camera, &GlobalTransform)>,
     mut demo: ResMut<IsoDemo>,
     map_query: Query<(&saddle_world_tilemap::Tilemap, &GlobalTransform)>,
+    automation: Res<IsoAutomation>,
     mut overlay: Single<&mut Text, With<OverlayText>>,
     mut commands_out: MessageWriter<TilemapCommand>,
 ) {
@@ -82,9 +103,11 @@ fn update_pick(
     };
     let (camera, camera_transform) = *camera;
 
-    let hovered = support::cursor_world(windows.into_inner(), camera, camera_transform)
-        .and_then(|world| map.geometry.world_to_tile(map_transform, world))
-        .filter(in_isometric_bounds);
+    let hovered = automation.hovered_override.or_else(|| {
+        support::cursor_world(windows.into_inner(), camera, camera_transform)
+            .and_then(|world| map.geometry.world_to_tile(map_transform, world))
+            .filter(in_isometric_bounds)
+    });
 
     if hovered != demo.hovered {
         if let Some(previous) = demo.hovered {

@@ -5014,7 +5014,6 @@ dependencies = [
 [[package]]
 name = "saddle-world-fog-of-war"
 version = "0.1.0"
-source = "git+https://github.com/julien-blanchon/saddle-world-fog-of-war#a10afdd241ccba0323d0a1366eb320a32f2d2a7c"
 dependencies = [
  "bevy",
 ]
@@ -5051,6 +5050,7 @@ name = "saddle-world-tilemap-example-autotiling"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-tilemap",
  "saddle-world-tilemap-example-support",
@@ -5061,6 +5061,7 @@ name = "saddle-world-tilemap-example-basic"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-tilemap",
  "saddle-world-tilemap-example-support",
@@ -5071,6 +5072,7 @@ name = "saddle-world-tilemap-example-hex-strategy"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-hex-grid",
  "saddle-world-tilemap",
@@ -5082,6 +5084,7 @@ name = "saddle-world-tilemap-example-isometric"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-tilemap",
  "saddle-world-tilemap-example-support",
@@ -5102,6 +5105,7 @@ name = "saddle-world-tilemap-example-platformer"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-tilemap",
  "saddle-world-tilemap-example-support",
@@ -5137,6 +5141,7 @@ name = "saddle-world-tilemap-example-runtime-editing"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-tilemap",
  "saddle-world-tilemap-example-support",
@@ -5160,6 +5165,7 @@ name = "saddle-world-tilemap-example-tile-painter"
 version = "0.1.0"
 dependencies = [
  "bevy",
+ "saddle-bevy-e2e",
  "saddle-pane",
  "saddle-world-tilemap",
  "saddle-world-tilemap-example-support",

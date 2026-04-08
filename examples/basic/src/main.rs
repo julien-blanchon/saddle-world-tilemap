@@ -1,3 +1,6 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
@@ -7,6 +10,11 @@ use saddle_world_tilemap::{
 };
 use support::{DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
 
+#[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub enum BasicSystems {
+    Drive,
+}
+
 #[derive(Resource)]
 struct BasicDemo {
     map: Entity,
@@ -14,37 +22,49 @@ struct BasicDemo {
     highlight_kind: saddle_world_tilemap::TileKindId,
 }
 
+#[derive(Resource, Default)]
+struct BasicAutomation {
+    hovered_override: Option<TileCoord>,
+}
+
 fn main() {
-    App::new()
-        .insert_resource(support::TilemapExamplePane {
-            debug_enabled: true,
-            draw_chunk_bounds: true,
-            ..default()
-        })
-        .add_plugins(
-            DefaultPlugins
-                .set(ImagePlugin::default_nearest())
-                .set(WindowPlugin {
-                    primary_window: Some(Window {
-                        title: "tilemap basic".into(),
-                        resolution: (1360, 920).into(),
-                        ..default()
-                    }),
+    let mut app = App::new();
+    app.insert_resource(support::TilemapExamplePane {
+        debug_enabled: true,
+        draw_chunk_bounds: true,
+        ..default()
+    })
+    .insert_resource(BasicAutomation::default())
+    .add_plugins(
+        DefaultPlugins
+            .set(ImagePlugin::default_nearest())
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    title: "tilemap basic".into(),
+                    resolution: (1360, 920).into(),
                     ..default()
                 }),
-        )
-        .add_plugins(support::pane_plugins())
-        .add_plugins(
-            TilemapPlugin::default().with_debug_settings(TilemapDebugSettings {
-                enabled: true,
-                draw_dirty_chunks: false,
                 ..default()
             }),
-        )
-        .register_pane::<support::TilemapExamplePane>()
-        .add_systems(Startup, setup)
-        .add_systems(Update, (support::sync_example_pane, update_hover))
-        .run();
+    )
+    .add_plugins(support::pane_plugins())
+    .add_plugins(
+        TilemapPlugin::default().with_debug_settings(TilemapDebugSettings {
+            enabled: true,
+            draw_dirty_chunks: false,
+            ..default()
+        }),
+    )
+    .register_pane::<support::TilemapExamplePane>()
+    .configure_sets(Update, BasicSystems::Drive)
+    .add_systems(Startup, setup)
+    .add_systems(
+        Update,
+        (support::sync_example_pane, update_hover).in_set(BasicSystems::Drive),
+    );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::BasicExampleE2EPlugin);
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -91,6 +111,7 @@ fn update_hover(
         &GlobalTransform,
         &saddle_world_tilemap::TilemapDiagnostics,
     )>,
+    automation: Res<BasicAutomation>,
     mut overlay: Single<&mut Text, With<OverlayText>>,
     mut commands_out: MessageWriter<TilemapCommand>,
 ) {
@@ -99,9 +120,11 @@ fn update_hover(
     };
     let (camera, camera_transform) = *camera;
 
-    let hovered = support::cursor_world(windows.into_inner(), camera, camera_transform)
-        .and_then(|world| map.geometry.world_to_tile(map_transform, world))
-        .filter(in_square_bounds);
+    let hovered = automation.hovered_override.or_else(|| {
+        support::cursor_world(windows.into_inner(), camera, camera_transform)
+            .and_then(|world| map.geometry.world_to_tile(map_transform, world))
+            .filter(in_square_bounds)
+    });
 
     if hovered != demo.hovered {
         if let Some(previous) = demo.hovered {

@@ -1,9 +1,17 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
 use saddle_pane::prelude::*;
 use saddle_world_tilemap::{TileCoord, TilemapCommand, TilemapDebugOverlay, TilemapPlugin};
 use support::{DETAIL_LAYER, DemoPalette, HIGHLIGHT_LAYER, OverlayText, SQUARE_SIZE};
+
+#[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub enum AutotilingSystems {
+    Drive,
+}
 
 #[derive(Resource)]
 struct AutotileDemo {
@@ -16,8 +24,15 @@ struct AutotileDemo {
     road_kind: saddle_world_tilemap::TileKindId,
 }
 
+#[derive(Resource, Default)]
+struct AutotileAutomation {
+    pause_timer: bool,
+    pending_steps: usize,
+}
+
 fn main() {
-    App::new()
+    let mut app = App::new();
+    app.insert_resource(AutotileAutomation::default())
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -33,12 +48,17 @@ fn main() {
         .add_plugins(support::pane_plugins())
         .add_plugins(TilemapPlugin::default())
         .register_pane::<support::TilemapExamplePane>()
+        .configure_sets(Update, AutotilingSystems::Drive)
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (support::sync_example_pane, grow_roads, update_overlay),
-        )
-        .run();
+            (support::sync_example_pane, grow_roads, update_overlay)
+                .chain()
+                .in_set(AutotilingSystems::Drive),
+        );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::AutotilingExampleE2EPlugin);
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -83,9 +103,19 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
 fn grow_roads(
     time: Res<Time>,
     mut demo: ResMut<AutotileDemo>,
+    mut automation: ResMut<AutotileAutomation>,
     mut commands_out: MessageWriter<TilemapCommand>,
 ) {
-    if !demo.timer.tick(time.delta()).just_finished() || demo.next_index >= demo.expansion.len() {
+    let should_advance = if automation.pending_steps > 0 {
+        automation.pending_steps -= 1;
+        true
+    } else if automation.pause_timer {
+        false
+    } else {
+        demo.timer.tick(time.delta()).just_finished()
+    };
+
+    if !should_advance || demo.next_index >= demo.expansion.len() {
         return;
     }
 

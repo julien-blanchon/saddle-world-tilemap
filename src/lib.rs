@@ -185,7 +185,9 @@ impl Plugin for TilemapPlugin {
                     systems::advance_animation.in_set(TilemapSystems::AdvanceAnimation),
                     systems::resolve_dirty_chunks.in_set(TilemapSystems::ResolveAutotiling),
                     systems::sync_collision_chunks.in_set(TilemapSystems::SyncCollision),
-                    systems::sync_render_chunks.in_set(TilemapSystems::SyncRender),
+                    systems::sync_render_chunks
+                        .in_set(TilemapSystems::SyncRender)
+                        .run_if(systems::render_backend_is_available),
                     systems::sync_layer_visibility.in_set(TilemapSystems::SyncRender),
                 )
                     .run_if(systems::runtime_is_active),

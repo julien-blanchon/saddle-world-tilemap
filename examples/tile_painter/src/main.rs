@@ -1,3 +1,6 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
@@ -43,6 +46,17 @@ struct PainterDemo {
     last_paint: Option<TileCoord>,
 }
 
+#[derive(Resource, Default)]
+struct PainterAutomation {
+    hovered_override: Option<TileCoord>,
+    pending_click: Option<TileCoord>,
+}
+
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum TilePainterSystems {
+    Drive,
+}
+
 const PALETTE_ORDER: &[fn(&support::DemoTileIds) -> TileKindId] = &[
     |t| t.grass,
     |t| t.soil,
@@ -60,12 +74,14 @@ const PALETTE_NAMES: &[&str] = &[
 ];
 
 fn main() {
-    App::new()
-        .insert_resource(support::TilemapExamplePane {
+    let mut app = App::new();
+
+    app.insert_resource(support::TilemapExamplePane {
             debug_enabled: true,
             draw_chunk_bounds: true,
             ..default()
         })
+        .insert_resource(PainterAutomation::default())
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -87,12 +103,22 @@ fn main() {
             }),
         )
         .register_pane::<support::TilemapExamplePane>()
+        .configure_sets(Update, TilePainterSystems::Drive)
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (support::sync_example_pane, painter_input, update_overlay),
-        )
-        .run();
+            (
+                support::sync_example_pane,
+                painter_input,
+                update_overlay,
+            )
+                .chain()
+                .in_set(TilePainterSystems::Drive),
+        );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::TilePainterExampleE2EPlugin);
+
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -107,7 +133,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
     );
     support::spawn_overlay(
         &mut commands,
-        "Tile Painter — Click to paint. 1-9: select tile, Q/W/E/R/T: brush mode, +/-: brush radius",
+        "Tile Painter — Click to paint. The canvas starts grass-filled and the default brush is Soil so the first stroke is visible.\n1-9: select tile, Q/W/E/R/T: brush mode, +/-: brush radius",
     );
 
     let map_entity = support::spawn_map(
@@ -125,7 +151,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
         map: map_entity,
         palette,
         brush_mode: BrushMode::Pencil,
-        brush_tile_index: 0,
+        brush_tile_index: 1,
         brush_radius: 1,
         line_start: None,
         hovered: None,
@@ -138,6 +164,7 @@ fn painter_input(
     camera: Single<(&Camera, &GlobalTransform)>,
     buttons: Res<ButtonInput<MouseButton>>,
     keys: Res<ButtonInput<KeyCode>>,
+    mut automation: ResMut<PainterAutomation>,
     mut demo: ResMut<PainterDemo>,
     map_query: Query<(&saddle_world_tilemap::Tilemap, &GlobalTransform)>,
     mut commands_out: MessageWriter<TilemapCommand>,
@@ -189,9 +216,11 @@ fn painter_input(
     };
     let (camera, camera_transform) = *camera;
 
-    let hovered = support::cursor_world(windows.into_inner(), camera, camera_transform)
-        .and_then(|world| map.geometry.world_to_tile(map_transform, world))
-        .filter(in_canvas_bounds);
+    let hovered = automation.hovered_override.or_else(|| {
+        support::cursor_world(windows.into_inner(), camera, camera_transform)
+            .and_then(|world| map.geometry.world_to_tile(map_transform, world))
+            .filter(in_canvas_bounds)
+    });
 
     if let Some(prev) = demo.hovered {
         if Some(prev) != hovered {
@@ -215,12 +244,18 @@ fn painter_input(
     let Some(coord) = hovered else {
         return;
     };
+    let automation_clicked_here = automation.pending_click.take() == Some(coord);
+    if automation_clicked_here {
+        demo.last_paint = None;
+    }
 
     let current_tile_kind = PALETTE_ORDER[demo.brush_tile_index](&demo.palette.tiles);
 
     match demo.brush_mode {
         BrushMode::Pencil => {
-            if buttons.pressed(MouseButton::Left) && demo.last_paint != Some(coord) {
+            if (buttons.pressed(MouseButton::Left) || automation_clicked_here)
+                && demo.last_paint != Some(coord)
+            {
                 commands_out.write(TilemapCommand::SetTile {
                     map: demo.map,
                     layer: GROUND_LAYER,
@@ -229,12 +264,12 @@ fn painter_input(
                 });
                 demo.last_paint = Some(coord);
             }
-            if !buttons.pressed(MouseButton::Left) {
+            if !buttons.pressed(MouseButton::Left) && !automation_clicked_here {
                 demo.last_paint = None;
             }
         }
         BrushMode::Line => {
-            if buttons.just_pressed(MouseButton::Left) {
+            if buttons.just_pressed(MouseButton::Left) || automation_clicked_here {
                 if let Some(start) = demo.line_start {
                     commands_out.write(TilemapCommand::FillLine {
                         map: demo.map,
@@ -250,7 +285,7 @@ fn painter_input(
             }
         }
         BrushMode::Circle => {
-            if buttons.just_pressed(MouseButton::Left) {
+            if buttons.just_pressed(MouseButton::Left) || automation_clicked_here {
                 commands_out.write(TilemapCommand::FillCircle {
                     map: demo.map,
                     layer: GROUND_LAYER,
@@ -261,7 +296,7 @@ fn painter_input(
             }
         }
         BrushMode::Fill => {
-            if buttons.just_pressed(MouseButton::Left) {
+            if buttons.just_pressed(MouseButton::Left) || automation_clicked_here {
                 commands_out.write(TilemapCommand::FloodFill {
                     map: demo.map,
                     layer: GROUND_LAYER,
@@ -272,7 +307,9 @@ fn painter_input(
             }
         }
         BrushMode::Eraser => {
-            if buttons.pressed(MouseButton::Left) && demo.last_paint != Some(coord) {
+            if (buttons.pressed(MouseButton::Left) || automation_clicked_here)
+                && demo.last_paint != Some(coord)
+            {
                 commands_out.write(TilemapCommand::ClearTile {
                     map: demo.map,
                     layer: GROUND_LAYER,
@@ -280,7 +317,7 @@ fn painter_input(
                 });
                 demo.last_paint = Some(coord);
             }
-            if !buttons.pressed(MouseButton::Left) {
+            if !buttons.pressed(MouseButton::Left) && !automation_clicked_here {
                 demo.last_paint = None;
             }
         }

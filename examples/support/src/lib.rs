@@ -654,6 +654,49 @@ pub fn cursor_world(
         .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor).ok())
 }
 
+pub fn parse_e2e_args(args: &[String]) -> (Option<String>, bool) {
+    let mut scenario_name = None;
+    let mut handoff = false;
+
+    for arg in args.iter().skip(1) {
+        if arg == "--handoff" {
+            handoff = true;
+        } else if !arg.starts_with('-') && scenario_name.is_none() {
+            scenario_name = Some(arg.clone());
+        }
+    }
+
+    if !handoff {
+        handoff = std::env::var("E2E_HANDOFF").is_ok_and(|value| value == "1" || value == "true");
+    }
+
+    (scenario_name, handoff)
+}
+
+pub fn named_entity_exists(world: &mut World, name: &str) -> bool {
+    let mut query = world.query::<&Name>();
+    query
+        .iter(world)
+        .any(|entity_name| entity_name.as_str() == name)
+}
+
+pub fn overlay_text(world: &mut World) -> Option<String> {
+    let mut query = world.query::<(&Name, &Text)>();
+    query
+        .iter(world)
+        .find_map(|(name, text)| (name.as_str() == "Overlay").then(|| text.0.clone()))
+}
+
+pub fn render_chunk_count(world: &mut World) -> usize {
+    let mut query = world.query::<&saddle_world_tilemap::TilemapRenderChunk>();
+    query.iter(world).count()
+}
+
+pub fn collision_chunk_count(world: &mut World) -> usize {
+    let mut query = world.query::<&saddle_world_tilemap::TilemapCollisionChunk>();
+    query.iter(world).count()
+}
+
 fn full_cardinal_rule_set(base_index: u32) -> AutotileRuleSet {
     let mut rules = AutotileRuleSet::new(AutotileNeighborhood::Cardinal4, base_index);
     for mask in 0..16 {

@@ -452,13 +452,8 @@ impl Tilemap {
         radius: u32,
         tile: TileCell,
     ) {
-        let r = radius as i32;
-        for dy in -r..=r {
-            for dx in -r..=r {
-                if dx * dx + dy * dy <= r * r {
-                    self.set_tile(layer_id, center.offset(dx, dy), tile.clone());
-                }
-            }
+        for coord in fill_circle_coords(center, radius) {
+            self.set_tile(layer_id, coord, tile.clone());
         }
     }
 
@@ -481,30 +476,11 @@ impl Tilemap {
         tile: TileCell,
         max_tiles: usize,
     ) -> usize {
-        let target_kind = self.get_tile(layer_id, start).map(|c| c.kind);
-        if target_kind == Some(tile.kind) {
-            return 0;
+        let coords = flood_fill_coords(self, layer_id, start, tile.kind, max_tiles);
+        for coord in &coords {
+            self.set_tile(layer_id, *coord, tile.clone());
         }
-        let mut stack = vec![start];
-        let mut visited = std::collections::BTreeSet::new();
-        let mut count = 0;
-        while let Some(coord) = stack.pop() {
-            if !visited.insert(coord) || count >= max_tiles {
-                continue;
-            }
-            let current_kind = self.get_tile(layer_id, coord).map(|c| c.kind);
-            if current_kind != target_kind {
-                continue;
-            }
-            self.set_tile(layer_id, coord, tile.clone());
-            count += 1;
-            for neighbor in coord.cardinal_neighbors() {
-                if !visited.contains(&neighbor) {
-                    stack.push(neighbor);
-                }
-            }
-        }
-        count
+        coords.len()
     }
 
     pub fn set_layer_visibility(&mut self, layer_id: TileLayerId, visible: bool) {
@@ -598,7 +574,20 @@ impl Default for Tilemap {
     }
 }
 
-fn bresenham_line(from: TileCoord, to: TileCoord) -> Vec<TileCoord> {
+pub(crate) fn fill_circle_coords(center: TileCoord, radius: u32) -> Vec<TileCoord> {
+    let r = radius as i32;
+    let mut coords = Vec::new();
+    for dy in -r..=r {
+        for dx in -r..=r {
+            if dx * dx + dy * dy <= r * r {
+                coords.push(center.offset(dx, dy));
+            }
+        }
+    }
+    coords
+}
+
+pub(crate) fn bresenham_line(from: TileCoord, to: TileCoord) -> Vec<TileCoord> {
     let mut coords = Vec::new();
     let dx = (to.x - from.x).abs();
     let dy = -(to.y - from.y).abs();
@@ -622,6 +611,43 @@ fn bresenham_line(from: TileCoord, to: TileCoord) -> Vec<TileCoord> {
             y += sy;
         }
     }
+    coords
+}
+
+pub(crate) fn flood_fill_coords(
+    map: &Tilemap,
+    layer_id: TileLayerId,
+    start: TileCoord,
+    replacement_kind: TileKindId,
+    max_tiles: usize,
+) -> Vec<TileCoord> {
+    let target_kind = map.get_tile(layer_id, start).map(|cell| cell.kind);
+    if target_kind == Some(replacement_kind) {
+        return Vec::new();
+    }
+
+    let mut stack = vec![start];
+    let mut visited = std::collections::BTreeSet::new();
+    let mut coords = Vec::new();
+
+    while let Some(coord) = stack.pop() {
+        if !visited.insert(coord) || coords.len() >= max_tiles {
+            continue;
+        }
+
+        let current_kind = map.get_tile(layer_id, coord).map(|cell| cell.kind);
+        if current_kind != target_kind {
+            continue;
+        }
+
+        coords.push(coord);
+        for neighbor in coord.cardinal_neighbors() {
+            if !visited.contains(&neighbor) {
+                stack.push(neighbor);
+            }
+        }
+    }
+
     coords
 }
 

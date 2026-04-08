@@ -1,9 +1,10 @@
 use crate::{
     AutotileBinding, AutotileGroupId, AutotileNeighborhood, AutotileRuleSet, AutotileRuleSetId,
-    TileAnimation, TileAtlasLayout, TileCatalog, TileCell, TileCollisionDescriptor, TileKind,
-    TileKindId, TileLayerConfig, TileLayerId, TileLayerRenderConfig, TileLayerState, Tilemap,
-    TilemapBundle, TilemapCollisionChunk, TilemapCommand, TilemapGeometry, TilemapLayerNode,
-    TilemapPlugin, TilemapRenderChunk, TilemapRoot, rendering::TilemapRuntimeComponent,
+    TileAnimation, TileAtlasLayout, TileCatalog, TileCell, TileChanged, TileCollisionDescriptor,
+    TileKind, TileKindId, TileLayerConfig, TileLayerId, TileLayerRenderConfig, TileLayerState,
+    Tilemap, TilemapBundle, TilemapCollisionChunk, TilemapCommand, TilemapGeometry,
+    TilemapLayerNode, TilemapPlugin, TilemapRenderChunk, TilemapRoot, TilemapSystems,
+    rendering::TilemapRuntimeComponent,
 };
 use bevy::prelude::*;
 use bevy::time::TimeUpdateStrategy;
@@ -76,6 +77,36 @@ fn spawn_test_map(app: &mut App) -> Entity {
     app.world_mut()
         .spawn(TilemapBundle::new("Test Map", map))
         .id()
+}
+
+fn spawn_logic_only_map(app: &mut App) -> Entity {
+    let mut catalog = TileCatalog::default();
+    catalog.insert_kind(TileKindId::new(1), TileKind::static_tile("grass", 0));
+
+    let mut map = Tilemap::new(TilemapGeometry::square(Vec2::splat(16.0)), UVec2::splat(4))
+        .with_layer(TileLayerState::new(
+            TileLayerConfig::logic_only(TileLayerId::new(1), "logic"),
+            catalog,
+        ));
+    map.set_tile(
+        TileLayerId::new(1),
+        crate::TileCoord::new(0, 0),
+        TileCell::new(TileKindId::new(1)),
+    );
+
+    app.world_mut()
+        .spawn(TilemapBundle::new("Logic Only Map", map))
+        .id()
+}
+
+#[derive(Resource, Default)]
+struct ObservedTileChanges(Vec<TileChanged>);
+
+fn collect_tile_changes(
+    mut reader: MessageReader<TileChanged>,
+    mut observed: ResMut<ObservedTileChanges>,
+) {
+    observed.0.extend(reader.read().cloned());
 }
 
 #[test]
@@ -252,4 +283,110 @@ fn visibility_commands_hide_layer_nodes() {
         .find(|(node, _)| node.layer == TileLayerId::new(1))
         .expect("layer node");
     assert_eq!(*visibility, Visibility::Hidden);
+}
+
+#[test]
+fn logic_only_maps_do_not_require_render_assets() {
+    let mut app = App::new();
+    app.add_plugins(MinimalPlugins)
+        .add_plugins(TilemapPlugin::always_on(Update));
+    app.world_mut()
+        .resource_mut::<crate::systems::TilemapRuntimeControl>()
+        .active = true;
+
+    let map = spawn_logic_only_map(&mut app);
+    app.update();
+    app.update();
+
+    assert!(app.world().entities().contains(map));
+    let world = app.world_mut();
+    let mut query = world.query::<&TilemapRenderChunk>();
+    assert_eq!(query.iter(world).count(), 0);
+}
+
+#[test]
+fn collision_chunk_total_persists_after_the_rebuild_frame() {
+    let mut app = build_test_app();
+    let map = spawn_test_map(&mut app);
+    app.update();
+
+    app.world_mut()
+        .resource_mut::<Messages<TilemapCommand>>()
+        .write(TilemapCommand::SetTile {
+            map,
+            layer: TileLayerId::new(2),
+            coord: crate::TileCoord::new(6, 1),
+            tile: TileCell::new(TileKindId::new(4)),
+        });
+    app.update();
+    app.update();
+
+    let world = app.world_mut();
+    let mut query = world.query_filtered::<&crate::TilemapDiagnostics, With<TilemapRoot>>();
+    let diagnostics = query.single(world).expect("tilemap diagnostics");
+    assert_eq!(diagnostics.collision_chunks_total, 1);
+}
+
+#[test]
+fn fill_circle_command_reports_every_tile_change() {
+    let mut app = build_test_app();
+    app.insert_resource(ObservedTileChanges::default());
+    app.add_systems(
+        Update,
+        collect_tile_changes.after(TilemapSystems::ApplyCommands),
+    );
+
+    let map = spawn_test_map(&mut app);
+    app.update();
+
+    app.world_mut()
+        .resource_mut::<Messages<TilemapCommand>>()
+        .write(TilemapCommand::FillCircle {
+            map,
+            layer: TileLayerId::new(1),
+            center: crate::TileCoord::new(6, 6),
+            radius: 1,
+            tile: TileCell::new(TileKindId::new(1)),
+        });
+    app.update();
+
+    let observed = &app.world().resource::<ObservedTileChanges>().0;
+    assert_eq!(observed.len(), 5);
+
+    let world = app.world_mut();
+    let mut query = world.query_filtered::<&crate::TilemapDiagnostics, With<TilemapRoot>>();
+    let diagnostics = query.single(world).expect("tilemap diagnostics");
+    assert_eq!(diagnostics.tile_edits_this_frame, 5);
+}
+
+#[test]
+fn flood_fill_command_reports_every_tile_change() {
+    let mut app = build_test_app();
+    app.insert_resource(ObservedTileChanges::default());
+    app.add_systems(
+        Update,
+        collect_tile_changes.after(TilemapSystems::ApplyCommands),
+    );
+
+    let map = spawn_test_map(&mut app);
+    app.update();
+
+    app.world_mut()
+        .resource_mut::<Messages<TilemapCommand>>()
+        .write(TilemapCommand::FloodFill {
+            map,
+            layer: TileLayerId::new(1),
+            start: crate::TileCoord::new(8, 8),
+            tile: TileCell::new(TileKindId::new(1)),
+            max_tiles: 4,
+        });
+    app.update();
+
+    let observed = &app.world().resource::<ObservedTileChanges>().0;
+    assert_eq!(observed.len(), 4);
+
+    let world = app.world_mut();
+    let mut query = world.query_filtered::<&crate::TilemapDiagnostics, With<TilemapRoot>>();
+    let diagnostics = query.single(world).expect("tilemap diagnostics");
+    assert_eq!(diagnostics.tile_edits_this_frame, 4);
 }

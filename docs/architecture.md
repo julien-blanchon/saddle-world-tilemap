@@ -109,6 +109,7 @@ The crate deliberately stops at descriptors. A physics integration layer can tra
 - rebuilds one mesh per dirty chunk per visual layer
 - keeps layer ordering and visibility on the layer node
 - uses chunk-local mesh projection based on `TilemapGeometry`
+- skips itself automatically when the app has no mesh/material asset resources, so logic-only or headless integrations can keep the rest of the runtime active
 
 The current backend is a simple internal chunk mesh builder using `Mesh2d` and `ColorMaterial`. The public crate surface does not expose the renderer internals so this can evolve later.
 

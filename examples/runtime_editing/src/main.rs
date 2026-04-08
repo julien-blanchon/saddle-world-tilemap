@@ -1,3 +1,6 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use saddle_world_tilemap_example_support as support;
 
 use bevy::prelude::*;
@@ -9,6 +12,11 @@ use support::{
     COLLISION_LAYER, DETAIL_LAYER, DemoPalette, GROUND_LAYER, HIGHLIGHT_LAYER, OverlayText,
     SQUARE_SIZE,
 };
+
+#[derive(SystemSet, Debug, Clone, Copy, Hash, PartialEq, Eq)]
+pub enum RuntimeEditingSystems {
+    Drive,
+}
 
 #[derive(Resource)]
 struct RuntimeEditingDemo {
@@ -25,8 +33,15 @@ struct RuntimeEditingDemo {
     highlight_kind: saddle_world_tilemap::TileKindId,
 }
 
+#[derive(Resource, Default)]
+struct RuntimeEditingAutomation {
+    pause_timer: bool,
+    advance_once: bool,
+}
+
 fn main() {
-    App::new()
+    let mut app = App::new();
+    app.insert_resource(RuntimeEditingAutomation::default())
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -42,12 +57,17 @@ fn main() {
         .add_plugins(support::pane_plugins())
         .add_plugins(TilemapPlugin::default())
         .register_pane::<support::TilemapExamplePane>()
+        .configure_sets(Update, RuntimeEditingSystems::Drive)
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (support::sync_example_pane, run_edit_cycle, update_overlay),
-        )
-        .run();
+            (support::sync_example_pane, run_edit_cycle, update_overlay)
+                .chain()
+                .in_set(RuntimeEditingSystems::Drive),
+        );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::RuntimeEditingExampleE2EPlugin);
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -101,9 +121,19 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
 fn run_edit_cycle(
     time: Res<Time>,
     mut demo: ResMut<RuntimeEditingDemo>,
+    mut automation: ResMut<RuntimeEditingAutomation>,
     mut commands_out: MessageWriter<TilemapCommand>,
 ) {
-    if !demo.timer.tick(time.delta()).just_finished() {
+    let should_advance = if automation.advance_once {
+        automation.advance_once = false;
+        true
+    } else if automation.pause_timer {
+        false
+    } else {
+        demo.timer.tick(time.delta()).just_finished()
+    };
+
+    if !should_advance {
         return;
     }
 

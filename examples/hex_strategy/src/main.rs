@@ -1,3 +1,6 @@
+#[cfg(feature = "e2e")]
+mod e2e;
+
 use std::collections::HashSet;
 
 use saddle_world_tilemap_example_support as support;
@@ -19,13 +22,25 @@ struct HexStrategyDemo {
     highlight_kind: saddle_world_tilemap::TileKindId,
 }
 
+#[derive(Resource, Default)]
+struct HexStrategyAutomation {
+    hovered_override: Option<AxialHex>,
+}
+
+#[derive(SystemSet, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum HexStrategySystems {
+    Drive,
+}
+
 fn main() {
-    App::new()
-        .insert_resource(support::TilemapExamplePane {
+    let mut app = App::new();
+
+    app.insert_resource(support::TilemapExamplePane {
             detail_layer_visible: true,
             highlight_alpha: 0.8,
             ..default()
         })
+        .insert_resource(HexStrategyAutomation::default())
         .add_plugins(
             DefaultPlugins
                 .set(ImagePlugin::default_nearest())
@@ -41,9 +56,18 @@ fn main() {
         .add_plugins(support::pane_plugins())
         .add_plugins(TilemapPlugin::default())
         .register_pane::<support::TilemapExamplePane>()
+        .configure_sets(Update, HexStrategySystems::Drive)
         .add_systems(Startup, setup)
-        .add_systems(Update, (support::sync_example_pane, update_strategy))
-        .run();
+        .add_systems(
+            Update,
+            (support::sync_example_pane, update_strategy)
+                .chain()
+                .in_set(HexStrategySystems::Drive),
+        );
+    #[cfg(feature = "e2e")]
+    app.add_plugins(e2e::HexStrategyExampleE2EPlugin);
+
+    app.run();
 }
 
 fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
@@ -106,6 +130,7 @@ fn setup(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
 fn update_strategy(
     windows: Single<&Window>,
     camera: Single<(&Camera, &GlobalTransform)>,
+    automation: Res<HexStrategyAutomation>,
     mut demo: ResMut<HexStrategyDemo>,
     map_query: Query<(&saddle_world_tilemap::Tilemap, &GlobalTransform)>,
     mut overlay: Single<&mut Text, With<OverlayText>>,
@@ -115,10 +140,12 @@ fn update_strategy(
         return;
     };
     let (camera, camera_transform) = *camera;
-    let hovered = support::cursor_world(windows.into_inner(), camera, camera_transform)
-        .and_then(|world| map.geometry.world_to_tile(map_transform, world))
-        .map(support::hex_tile_to_axial)
-        .filter(|hex| demo.board.contains(hex));
+    let hovered = automation.hovered_override.or_else(|| {
+        support::cursor_world(windows.into_inner(), camera, camera_transform)
+            .and_then(|world| map.geometry.world_to_tile(map_transform, world))
+            .map(support::hex_tile_to_axial)
+            .filter(|hex| demo.board.contains(hex))
+    });
 
     let path = hovered.and_then(|goal| current_path(&demo, map, goal));
     let next_highlighted: Vec<_> = path
@@ -134,18 +161,30 @@ fn update_strategy(
 
     if demo.hovered != hovered || demo.highlighted != next_highlighted {
         let map_entity = demo.map;
-        for coord in demo.highlighted.drain(..) {
+        let removed: Vec<_> = demo
+            .highlighted
+            .iter()
+            .copied()
+            .filter(|coord| !next_highlighted.contains(coord))
+            .collect();
+        let added: Vec<_> = next_highlighted
+            .iter()
+            .copied()
+            .filter(|coord| !demo.highlighted.contains(coord))
+            .collect();
+
+        for coord in removed {
             commands_out.write(TilemapCommand::ClearTile {
                 map: map_entity,
                 layer: HIGHLIGHT_LAYER,
                 coord,
             });
         }
-        for coord in &next_highlighted {
+        for coord in added {
             commands_out.write(TilemapCommand::SetTile {
                 map: map_entity,
                 layer: HIGHLIGHT_LAYER,
-                coord: *coord,
+                coord,
                 tile: saddle_world_tilemap::TileCell::new(demo.highlight_kind),
             });
         }

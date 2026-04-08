@@ -23,6 +23,7 @@ Runtime integration surface for logical maps, chunk sync, animation, and debug d
 - use `new(...)` for state-scoped gameplay or tool modes
 - use `always_on(Update)` for examples, editors, or always-live world tooling
 - if `GizmoPlugin` is not present, the debug draw system is skipped automatically
+- if render asset resources are not available, render chunk sync is skipped automatically and the logical/collision runtime still works
 
 ## `TilemapGeometry`
 
