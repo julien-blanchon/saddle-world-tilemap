@@ -5014,6 +5014,7 @@ dependencies = [
 [[package]]
 name = "saddle-world-fog-of-war"
 version = "0.1.0"
+source = "git+https://github.com/julien-blanchon/saddle-world-fog-of-war#0eedca8a2f5496013cbe13557fcc5d75b3bac305"
 dependencies = [
  "bevy",
 ]
