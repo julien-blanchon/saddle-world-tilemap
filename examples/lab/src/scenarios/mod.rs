@@ -5,7 +5,7 @@ use saddle_bevy_e2e::{action::Action, actions::assertions, scenario::Scenario};
 
 use crate::{CameraFocus, LabControl};
 use saddle_world_tilemap::{
-    TileCoord, TilePathCallbacks, TilePathOptions, TilePathStep, TilemapCommand,
+    TileCoord, TilePathCallbacks, TilePathOptions, TilePathStep,
     find_path, find_path_with_policy, reachable_tiles, reachable_tiles_with_policy,
 };
 
@@ -49,6 +49,24 @@ fn set_control(mutator: impl Fn(&mut LabControl) + Send + Sync + 'static) -> Act
         let mut control = world.resource_mut::<LabControl>();
         mutator(&mut control);
     }))
+}
+
+fn set_camera_focus(focus: CameraFocus) -> Action {
+    set_control(move |control| {
+        control.camera_focus = focus;
+    })
+}
+
+fn set_square_stage(stage: u8) -> Action {
+    set_control(move |control| {
+        control.square_edit_stage = stage;
+    })
+}
+
+fn set_iso_selection(selection: TileCoord) -> Action {
+    set_control(move |control| {
+        control.iso_selection = selection;
+    })
 }
 
 fn wait_for_diagnostics(
@@ -101,18 +119,14 @@ fn tilemap_smoke(name: &'static str) -> Scenario {
 fn tilemap_runtime_edit() -> Scenario {
     Scenario::builder("tilemap_runtime_edit")
         .description("Capture the overview before any staged edits, then apply a partial road branch and finally the full extension across chunk boundaries.")
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::Overview;
-            control.square_edit_stage = 0;
-        }))
+        .then(set_camera_focus(CameraFocus::Overview))
+        .then(set_square_stage(0))
         .then(wait_for_diagnostics("stage 0", |diagnostics| {
             diagnostics.square_applied_tiles == 0
         }))
         .then(Action::Screenshot("runtime_before".into()))
         .then(Action::WaitFrames(1))
-        .then(set_control(|control| {
-            control.square_edit_stage = 1;
-        }))
+        .then(set_square_stage(1))
         .then(wait_for_diagnostics("stage 1", |diagnostics| {
             diagnostics.square_applied_tiles == 4
                 && diagnostics.square_latest_edit == TileCoord::new(8, 12)
@@ -124,9 +138,7 @@ fn tilemap_runtime_edit() -> Scenario {
         ))
         .then(Action::Screenshot("runtime_partial".into()))
         .then(Action::WaitFrames(1))
-        .then(set_control(|control| {
-            control.square_edit_stage = 2;
-        }))
+        .then(set_square_stage(2))
         .then(wait_for_diagnostics("stage 2", |diagnostics| {
             diagnostics.square_applied_tiles == 10
                 && diagnostics.square_latest_edit == TileCoord::new(12, 10)
@@ -150,18 +162,14 @@ fn tilemap_runtime_edit() -> Scenario {
 fn tilemap_isometric_pick() -> Scenario {
     Scenario::builder("tilemap_isometric_pick")
         .description("Move the camera to the isometric board, pick a costly stone tile, then move to a cheaper grass tile and confirm the diagnostics change with the screenshots.")
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::Isometric;
-            control.iso_selection = TileCoord::new(6, 2);
-        }))
+        .then(set_camera_focus(CameraFocus::Isometric))
+        .then(set_iso_selection(TileCoord::new(6, 2)))
         .then(wait_for_diagnostics("stone selection", |diagnostics| {
             diagnostics.iso_selection == TileCoord::new(6, 2) && diagnostics.iso_selection_cost == 3
         }))
         .then(Action::Screenshot("iso_stone".into()))
         .then(Action::WaitFrames(1))
-        .then(set_control(|control| {
-            control.iso_selection = TileCoord::new(4, 4);
-        }))
+        .then(set_iso_selection(TileCoord::new(4, 4)))
         .then(wait_for_diagnostics("grass selection", |diagnostics| {
             diagnostics.iso_selection == TileCoord::new(4, 4) && diagnostics.iso_selection_cost == 1
         }))
@@ -183,17 +191,13 @@ fn tilemap_isometric_pick() -> Scenario {
 fn tilemap_large_map() -> Scenario {
     Scenario::builder("tilemap_large_map")
         .description("Sweep the camera from the left side of the large dense map to the right side and assert that the center tile and chunk indices cross chunk boundaries as expected.")
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::LargeLeft;
-        }))
+        .then(set_camera_focus(CameraFocus::LargeLeft))
         .then(wait_for_diagnostics("left focus", |diagnostics| {
             diagnostics.large_total_chunks >= 64 && diagnostics.large_center_chunk.x <= 2
         }))
         .then(Action::Screenshot("large_left".into()))
         .then(Action::WaitFrames(1))
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::LargeRight;
-        }))
+        .then(set_camera_focus(CameraFocus::LargeRight))
         .then(wait_for_diagnostics("right focus", |diagnostics| {
             diagnostics.large_center_chunk.x >= 5
         }))
@@ -334,16 +338,12 @@ fn tilemap_custom_path_policy() -> Scenario {
 }
 
 fn tilemap_layer_visibility() -> Scenario {
-    use saddle_world_tilemap_example_support::HIGHLIGHT_LAYER;
-
     Scenario::builder("tilemap_layer_visibility")
         .description("Hide and show the highlight layer on the square showcase map via SetLayerVisibility and assert render-chunk counts change accordingly.")
         .then(wait_for_diagnostics("maps ready", |diagnostics| {
             diagnostics.large_total_chunks >= 64
         }))
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::Overview;
-        }))
+        .then(set_camera_focus(CameraFocus::Overview))
         .then(Action::WaitFrames(5))
         // Capture baseline (highlight layer visible).
         .then(Action::Custom(Box::new(|world: &mut World| {
@@ -353,18 +353,7 @@ fn tilemap_layer_visibility() -> Scenario {
         .then(Action::WaitFrames(1))
         // Hide the highlight layer on the square map.
         .then(Action::Custom(Box::new(|world: &mut World| {
-            let mut query = world.query::<(Entity, &Name)>();
-            let square_map = query
-                .iter(world)
-                .find_map(|(entity, name)| (name.as_str() == "Square Showcase Map").then_some(entity))
-                .expect("Square Showcase Map must exist");
-            world
-                .resource_mut::<Messages<TilemapCommand>>()
-                .write(TilemapCommand::SetLayerVisibility {
-                    map: square_map,
-                    layer: HIGHLIGHT_LAYER,
-                    visible: false,
-                });
+            support::set_square_showcase_layer_visible(world, false);
         })))
         .then(wait_for_diagnostics("visibility toggles applied", |diagnostics| {
             // Give the system a frame to process the command — any stable diagnostic is fine.
@@ -375,18 +364,7 @@ fn tilemap_layer_visibility() -> Scenario {
         .then(Action::WaitFrames(1))
         // Restore the layer visibility.
         .then(Action::Custom(Box::new(|world: &mut World| {
-            let mut query = world.query::<(Entity, &Name)>();
-            let square_map = query
-                .iter(world)
-                .find_map(|(entity, name)| (name.as_str() == "Square Showcase Map").then_some(entity))
-                .expect("Square Showcase Map must exist");
-            world
-                .resource_mut::<Messages<TilemapCommand>>()
-                .write(TilemapCommand::SetLayerVisibility {
-                    map: square_map,
-                    layer: HIGHLIGHT_LAYER,
-                    visible: true,
-                });
+            support::set_square_showcase_layer_visible(world, true);
         })))
         .then(Action::WaitFrames(5))
         .then(Action::Screenshot("visibility_restored".into()))
@@ -436,10 +414,8 @@ fn tilemap_autotiling() -> Scenario {
              correctly places all 10 tiles on the square showcase map, confirming the \
              autotiling pipeline connects tiles across chunk boundaries.",
         )
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::Overview;
-            control.square_edit_stage = 2;
-        }))
+        .then(set_camera_focus(CameraFocus::Overview))
+        .then(set_square_stage(2))
         .then(wait_for_diagnostics("full branch applied", |diagnostics| {
             diagnostics.square_applied_tiles == 10
                 && diagnostics.square_rebuilds_last_frame > 0
@@ -470,11 +446,8 @@ fn tilemap_hex_strategy() -> Scenario {
              several tile selections with different movement costs, verifying the metadata \
              lookup works correctly for both cheap and expensive tile kinds.",
         )
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::Isometric;
-            // Stone tile — high cost
-            control.iso_selection = TileCoord::new(6, 2);
-        }))
+        .then(set_camera_focus(CameraFocus::Isometric))
+        .then(set_iso_selection(TileCoord::new(6, 2)))
         .then(wait_for_diagnostics("stone selected", |diagnostics| {
             diagnostics.iso_selection == TileCoord::new(6, 2) && diagnostics.iso_selection_cost >= 2
         }))
@@ -485,9 +458,7 @@ fn tilemap_hex_strategy() -> Scenario {
         .then(Action::Screenshot("hex_strategy_stone".into()))
         .then(Action::WaitFrames(1))
         // Grass tile — low cost
-        .then(set_control(|control| {
-            control.iso_selection = TileCoord::new(2, 6);
-        }))
+        .then(set_iso_selection(TileCoord::new(2, 6)))
         .then(wait_for_diagnostics("grass selected", |diagnostics| {
             diagnostics.iso_selection == TileCoord::new(2, 6) && diagnostics.iso_selection_cost <= 2
         }))
@@ -508,18 +479,14 @@ fn tilemap_tile_painter() -> Scenario {
              (0 → 1 → 2) and capture a screenshot at each stage so the visual diff confirms \
              the incremental painting behavior.",
         )
-        .then(set_control(|control| {
-            control.camera_focus = CameraFocus::Overview;
-            control.square_edit_stage = 0;
-        }))
+        .then(set_camera_focus(CameraFocus::Overview))
+        .then(set_square_stage(0))
         .then(wait_for_diagnostics("blank canvas", |diagnostics| {
             diagnostics.square_applied_tiles == 0
         }))
         .then(Action::Screenshot("tile_painter_stage0".into()))
         .then(Action::WaitFrames(1))
-        .then(set_control(|control| {
-            control.square_edit_stage = 1;
-        }))
+        .then(set_square_stage(1))
         .then(wait_for_diagnostics("partial paint", |diagnostics| {
             diagnostics.square_applied_tiles == 4 && diagnostics.square_rebuilds_last_frame > 0
         }))
@@ -529,9 +496,7 @@ fn tilemap_tile_painter() -> Scenario {
         ))
         .then(Action::Screenshot("tile_painter_stage1".into()))
         .then(Action::WaitFrames(1))
-        .then(set_control(|control| {
-            control.square_edit_stage = 2;
-        }))
+        .then(set_square_stage(2))
         .then(wait_for_diagnostics("full paint", |diagnostics| {
             diagnostics.square_applied_tiles == 10 && diagnostics.square_rebuilds_last_frame > 0
         }))
