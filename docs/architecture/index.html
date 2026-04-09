@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(() => {
+				document.documentElement.classList.add('js');
+				const storageKey = 'docs-theme';
+				const storedTheme = localStorage.getItem(storageKey);
+				const isDark =
+					storedTheme === 'dark' ||
+					(storedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.classList.toggle('dark', isDark);
+				document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+			})();
+		</script>
+		<link href="../../_app/immutable/entry/start.CtGtx6Gf.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DodK7cH3.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D6rU7RKI.js" rel="modulepreload">
+		<link href="../../_app/immutable/entry/app.DVd2v-hi.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D2PL5qU_.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DsnmJJEf.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/CGbRUU1n.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/0.DLZvDGnE.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Dh9VjZ81.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Dy2H2_Kx.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D3udy8KQ.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/2.B7p_b4PW.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/B2Agp9hA.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/5.BOp3_yHr.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/O7QY0ZL7.js" rel="modulepreload">
+		<!--12qhfyh--><meta name="theme-color" content="#ffffff"/> <link rel="icon" type="image/svg+xml" href="../../favicon.svg"/> <meta name="description" content="Reusable chunk-based tilemap toolkit for Bevy"/><!----><!--1bpnej--><!--[0--><meta name="description" content="`saddle-world-tilemap` Architecture documentation"/><!--]--><!----><title>`saddle-world-tilemap` Architecture - saddle-world-tilemap</title>
+		<link href="../../_app/immutable/assets/manifest.DAGDUwuc.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/0.Cu___w4E.css" rel="stylesheet">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[0--><!--[--><!--[0--><!--[--><main class="relative h-dvh bg-background text-foreground"><div class="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-border bg-background px-4 py-1.5 lg:hidden"><a href="../../" class="inline-flex items-center gap-1 px-2 py-2 text-sm tracking-tight text-foreground"><span class="font-medium tracking-tight text-foreground">saddle-world-tilemap</span></a> <button class="-mr-2 inline-flex size-10 items-center justify-center gap-2 rounded-sm text-sm whitespace-nowrap text-foreground transition-colors duration-150 ease-out hover:bg-background-muted lg:hidden" aria-label="Toggle menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="20" height="20" aria-hidden="true"><!--[-1--><!--]--><path d="M4 6H28V8H4z"></path><path d="M4 24H28V26H4z"></path><path d="M4 12H28V14H4z"></path><path d="M4 18H28V20H4z"></path></svg><!----></button></div> <!--[-1--><!--]--><!----> <div class="flex h-full w-full min-w-0 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:pr-4 xl:grid-cols-[22rem_minmax(0,56rem)_18rem] xl:justify-center"><div class="hidden lg:block"><aside class="flex h-dvh flex-col bg-background" aria-label="Documentation sidebar"><div class="flex flex-col gap-4 p-4"><a href="../../" class="flex items-center gap-2"><span class="text-xl font-medium tracking-tight text-foreground">saddle-world-tilemap</span></a> <!--[0--><button type="button" class="group inset-shadow relative flex h-9 w-full items-center gap-2 rounded-sm bg-background-inset px-3 py-1.5 text-sm font-medium text-foreground-muted/70 transition-[color] duration-150 ease-out hover:text-foreground-muted"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="text-foreground-muted/70"><!--[-1--><!--]--><path d="M29,27.5859l-7.5521-7.5521a11.0177,11.0177,0,1,0-1.4141,1.4141L27.5859,29ZM4,13a9,9,0,1,1,9,9A9.01,9.01,0,0,1,4,13Z"></path></svg><!----> <span class="flex-1 text-left">Search...</span> <!--[0--><kbd class="card pointer-events-none relative hidden h-5 items-center gap-1 rounded-xs bg-background px-1.5 font-mono text-[10px] font-medium text-foreground-muted/70 select-none sm:flex">⌘ K</kbd><!--]--></button><!--]--><!----></div> <div class="relative flex flex-col overflow-hidden flex-1 svelte-1lcbi17"><div class="scrollbar-hide min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto p-4 svelte-1lcbi17" style="mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);"><nav class="flex flex-col space-y-1" aria-label="Documentation pages"><h4 class="mb-2 ml-2 text-xs font-medium tracking-wide text-foreground-muted/70 uppercase">Docs</h4> <!--[--><!--[-1--><a href="../../" class="block rounded-sm px-3 py-1.5 text-sm tracking-normal transition-all duration-150 ease-out text-foreground-muted hover:bg-background-muted hover:text-foreground">Overview</a><!--]--><!--[0--><button class="flex w-full items-center justify-between rounded-sm px-3 py-1.5 text-sm font-medium tracking-normal transition-all duration-150 ease-out hover:bg-background-muted hover:text-foreground text-foreground-muted"><span>Documentation</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 transition-transform duration-150"><!--[-1--><!--]--><path d="M22 16 12 26 10.6 24.6 19.2 16 10.6 7.4 12 6z"></path></svg><!----></button> <!--[-1--><!--]--><!--]--><!--]--></nav><!----></div></div><!----> <div class="flex items-center gap-1 p-4"><!--[0--><button type="button" class="group transition-scale inset-shadow relative inline-flex size-7 items-center justify-center rounded-sm bg-background-inset text-foreground duration-150 ease-out active:scale-[0.95]" aria-label="Switch to dark mode"><span class="sr-only">Switch to dark mode</span> <span class="transition-transform duration-150 ease-out"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true"><!--[-1--><!--]--><path d="M16,12a4,4,0,1,1-4,4,4.0045,4.0045,0,0,1,4-4m0-2a6,6,0,1,0,6,6,6,6,0,0,0-6-6Z" transform="translate(0 .005)"></path><path d="M6.854 5.375H8.854V10.333H6.854z" transform="rotate(-45 7.86 7.856)"></path><path d="M2 15.005H7V17.005000000000003H2z"></path><path d="M5.375 23.147H10.333V25.147H5.375z" transform="rotate(-45 7.86 24.149)"></path><path d="M15 25.005H17V30.005H15z"></path><path d="M23.147 21.668H25.147V26.625999999999998H23.147z" transform="rotate(-45 24.152 24.149)"></path><path d="M25 15.005H30V17.005000000000003H25z"></path><path d="M21.668 6.854H26.625999999999998V8.854H21.668z" transform="rotate(-45 24.152 7.856)"></path><path d="M15 2.005H17V7.005H15z"></path></svg><!----></span> <span class="absolute transition-transform duration-150 ease-out scale-0 blur-[2px]"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true"><!--[-1--><!--]--><path d="M13.5025,5.4136A15.0755,15.0755,0,0,0,25.096,23.6082a11.1134,11.1134,0,0,1-7.9749,3.3893c-.1385,0-.2782.0051-.4178,0A11.0944,11.0944,0,0,1,13.5025,5.4136M14.98,3a1.0024,1.0024,0,0,0-.1746.0156A13.0959,13.0959,0,0,0,16.63,28.9973c.1641.006.3282,0,.4909,0a13.0724,13.0724,0,0,0,10.702-5.5556,1.0094,1.0094,0,0,0-.7833-1.5644A13.08,13.08,0,0,1,15.8892,4.38,1.0149,1.0149,0,0,0,14.98,3Z"></path></svg><!----></span></button><!--]--> <!--[0--><a class="group transition-scale inset-shadow relative inline-flex size-7 cursor-pointer items-center justify-center rounded-sm bg-background-inset text-foreground duration-150 ease-out active:scale-[0.95]" href="https://github.com/julien-blanchon/saddle-world-tilemap" target="_blank" rel="noreferrer" aria-label="Open project repository (opens in a new tab)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 flex-none"><!--[-1--><!--]--><path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"></path></svg><!----></a><!--]--></div></aside><!----></div> <div class="inset-shadow relative mx-auto h-full w-full max-w-4xl min-w-0 overflow-hidden border border-border bg-background-inset pt-12 lg:my-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-visible lg:rounded-xl lg:pt-0"><div class="relative flex flex-col overflow-hidden mx-auto h-full w-full lg:max-h-[calc(100dvh-2rem)] svelte-1lcbi17"><div id="docs-content-container" class="scrollbar-hide min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto rounded-lg overscroll-none flex flex-col gap-8 px-4 py-8 lg:px-8 svelte-1lcbi17" style="mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);"><section class="min-w-0 flex-1 space-y-8"><div class="space-y-4"><!--[-1--><!--]--> <h1 class="scroll-m-20 text-3xl font-medium tracking-tight text-foreground">`saddle-world-tilemap` Architecture</h1> <!--[0--><p class="max-w-4xl text-base font-normal tracking-normal text-foreground-muted">`saddle-world-tilemap` Architecture documentation</p><!--]--> <!--[0--><!--[0--><div class="relative z-20 mt-8 flex w-full gap-2 lg:hidden"><!--[0--><div class="inset-shadow w-full rounded-md bg-background-inset p-1.5"><button type="button" aria-live="polite" aria-disabled="false" class="card relative inline-flex h-9 w-full font-medium shrink-0 overflow-hidden items-center justify-center gap-2 rounded-sm bg-background px-4 py-2 text-sm whitespace-nowrap text-foreground transition-[background-color] duration-150 ease-out hover:bg-background-muted disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=size-])]:size-4 flex-1"><span class="grid place-items-center" style="grid-template-areas: 'content';"><!----><span class="flex items-center gap-2 font-medium tracking-normal text-foreground will-change-transform" style="grid-area: content;"><!--[-1--><svg role="img" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4 flex-none"><title>Markdown</title><path class="stroke-current" d="M1.212 5.5h21.576c.407 0 .712.317.712.679v11.549a.695.695 0 0 1-.712.677H1.212a.695.695 0 0 1-.712-.678V6.18c0-.362.305-.679.712-.679Z"></path><path class="fill-current" d="M3.03 15.96V7.946h2.425l2.424 2.946 2.424-2.946h2.424v8.014h-2.424v-4.596L7.88 14.31l-2.424-2.946v4.596H3.03Zm15.152 0-3.636-3.89h2.424V7.947h2.424v4.125h2.424l-3.636 3.889Z"></path></svg><!--]--> <span>Copy Markdown</span></span><!----></span></button></div><!--]--> <!--[0--><div class="inset-shadow relative rounded-md bg-background-inset p-1.5"><button id="mobile-doc-actions-menu-trigger" type="button" class="card relative inline-flex h-9 w-full font-medium shrink-0 overflow-hidden items-center justify-center gap-2 rounded-sm bg-background px-4 py-2 text-sm whitespace-nowrap text-foreground transition-[background-color] duration-150 ease-out hover:bg-background-muted disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=size-])]:size-4 flex-1 w-auto! px-2.5!" aria-label="More actions" aria-haspopup="menu" aria-controls="mobile-doc-actions-menu" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4"><!--[-1--><!--]--><circle cx="8" cy="16" r="2"></circle><circle cx="16" cy="16" r="2"></circle><circle cx="24" cy="16" r="2"></circle></svg><!----></button> <!--[-1--><!--]--></div><!--]--></div><!--]--><!--]--></div> <hr class="text-border"/> <div><!--[--><article data-doc-content="" class="w-full max-w-4xl"><!----><h2>Design goals</h2>
+<p><code>saddle-world-tilemap</code> is built around four rules:</p>
+<ol>
+<li>logical tile storage is the source of truth</li>
+<li>render chunks and collision chunks are projections of that logical state</li>
+<li>runtime edits stay localized through dirty-chunk tracking</li>
+<li>coordinate conversion remains explicit and testable</li>
+</ol>
+<h2>Main runtime split</h2>
+<h3>Logical model</h3>
+<p>The public logical model is:</p>
+<ul>
+<li><code>Tilemap</code></li>
+<li><code>TileLayerState</code></li>
+<li><code>TileChunk</code></li>
+<li><code>TileCatalog</code></li>
+<li><code>TileKind</code></li>
+<li><code>TileCell</code></li>
+</ul>
+<p><code>Tilemap</code> owns:</p>
+<ul>
+<li>map geometry</li>
+<li>chunk size</li>
+<li>stable layer IDs</li>
+<li>the per-layer chunk store</li>
+</ul>
+<p><code>TileLayerState</code> owns:</p>
+<ul>
+<li>the layer config</li>
+<li>the catalog for that layer</li>
+<li>dense chunk-local tile storage</li>
+<li>dirty sets for resolve, render, and collision</li>
+</ul>
+<p>The logical model never stores render entities directly.</p>
+<h3>Runtime projection state</h3>
+<p>Internal runtime state lives in <code>TilemapRuntimeComponent</code> and tracks:</p>
+<ul>
+<li>spawned layer nodes</li>
+<li>spawned render chunk entities</li>
+<li>spawned collision chunk entities</li>
+<li>animation playback state per animated tile kind</li>
+</ul>
+<p>This runtime cache is rebuildable. Deactivation clears it and leaves the logical tile state intact.</p>
+<h2>System pipeline</h2>
+<p><code>TilemapSystems</code> describes the intended frame order:</p>
+<ol>
+<li><code>Prepare</code></li>
+<li><code>ApplyCommands</code></li>
+<li><code>AdvanceAnimation</code></li>
+<li><code>ResolveAutotiling</code></li>
+<li><code>SyncCollision</code></li>
+<li><code>SyncRender</code></li>
+<li><code>Debug</code></li>
+</ol>
+<h3><code>Prepare</code></h3>
+<ul>
+<li>ensures every map root has runtime state</li>
+<li>spawns layer nodes lazily</li>
+<li>initializes diagnostics</li>
+<li>marks the full map dirty on first activation</li>
+</ul>
+<h3><code>ApplyCommands</code></h3>
+<ul>
+<li>consumes <code>TilemapCommand</code></li>
+<li>mutates logical tiles only</li>
+<li>emits <code>TileChanged</code> and <code>LayerVisibilityChanged</code></li>
+<li>marks the edited chunk, and neighboring chunks when autotile groups are involved</li>
+</ul>
+<h3><code>AdvanceAnimation</code></h3>
+<ul>
+<li>advances per-kind animation clocks</li>
+<li>marks only chunks containing the animated kind dirty when the visible frame changes</li>
+<li>emits <code>TileAnimationLooped</code> when a clip wraps</li>
+</ul>
+<p>Animation is definition-driven. The system never creates one timer per tile entity.</p>
+<h3><code>ResolveAutotiling</code></h3>
+<ul>
+<li>walks dirty logical chunks</li>
+<li>resolves each tile into:<ul>
+<li>final atlas index</li>
+<li>tint/orientation</li>
+<li>collision descriptor</li>
+<li>animated-kind membership</li>
+</ul>
+</li>
+<li>increments the chunk revision</li>
+<li>forwards the chunk to render and collision sync stages</li>
+</ul>
+<p>Autotiling uses reusable rule sets keyed by <code>AutotileRuleSetId</code>. The core implementation currently ships bitmask-style matching for cardinal or Moore neighborhoods.</p>
+<h3><code>SyncCollision</code></h3>
+<ul>
+<li>rebuilds <code>TilemapCollisionChunk</code> components from resolved descriptors</li>
+<li>despawns empty collision chunks</li>
+<li>keeps collision output generic and backend-agnostic</li>
+</ul>
+<p>The crate deliberately stops at descriptors. A physics integration layer can translate them into colliders later.</p>
+<h3><code>SyncRender</code></h3>
+<ul>
+<li>rebuilds one mesh per dirty chunk per visual layer</li>
+<li>keeps layer ordering and visibility on the layer node</li>
+<li>uses chunk-local mesh projection based on <code>TilemapGeometry</code></li>
+<li>skips itself automatically when the app has no mesh/material asset resources, so logic-only or headless integrations can keep the rest of the runtime active</li>
+</ul>
+<p>The current backend is a simple internal chunk mesh builder using <code>Mesh2d</code> and <code>ColorMaterial</code>. The public crate surface does not expose the renderer internals so this can evolve later.</p>
+<h3><code>Debug</code></h3>
+<ul>
+<li>draws chunk bounds and dirty chunks through gizmos when <code>GizmoPlugin</code> is present</li>
+<li>stays optional and data-driven through <code>TilemapDebugSettings</code> and <code>TilemapDebugOverlay</code></li>
+</ul>
+<h2>Chunk lifecycle</h2>
+<ol>
+<li>logical edits create or mutate <code>TileChunk</code></li>
+<li>the layer marks the chunk dirty</li>
+<li>resolution computes final visual and collision snapshots</li>
+<li>sync stages spawn or update chunk entities</li>
+<li>empty chunks despawn their render and collision projections</li>
+</ol>
+<p>Chunk coordinates are stable through <code>ChunkCoord</code>. Tile-to-chunk math uses Euclidean division so negative coordinates remain coherent.</p>
+<h2>Coordinate architecture</h2>
+<p><code>TilemapGeometry</code> is the only place that knows how a logical tile maps into local or world space.</p>
+<p>Current modes:</p>
+<ul>
+<li><code>Square</code></li>
+<li><code>IsometricDiamond</code></li>
+<li><code>HexPointyColumns</code></li>
+<li><code>HexFlatRows</code></li>
+</ul>
+<p>The same public helpers are used for:</p>
+<ul>
+<li>tile placement</li>
+<li>cursor picking</li>
+<li>world-to-tile conversion</li>
+<li>chunk debug rectangles</li>
+</ul>
+<p>This keeps authored content, procedural generation, and runtime picking on the same math path.</p>
+<h2>Pathfinding</h2>
+<p>The crate includes two standalone pathfinding functions that operate directly on the logical tile model:</p>
+<ul>
+<li><code>find_path</code> — A* search on a named tile layer, returning the optimal path as a <code>Vec&lt;TileCoord&gt;</code> with total accumulated cost</li>
+<li><code>reachable_tiles</code> — Dijkstra flood from a starting tile, returning all tiles reachable within a cost budget</li>
+</ul>
+<p>Both are convenience wrappers over:</p>
+<ul>
+<li><code>find_path_with_policy</code></li>
+<li><code>reachable_tiles_with_policy</code></li>
+<li><code>TilePathPolicy</code></li>
+<li><code>TilePathStep</code></li>
+<li><code>TilePathCallbacks</code></li>
+</ul>
+<p>Both functions:</p>
+<ul>
+<li>read tile data from <code>TileLayerState</code> without spawning entities</li>
+<li>require the destination tile to exist on the queried layer under the built-in policy</li>
+<li>default to <code>TileKindPathPolicy</code>, which treats same-layer <code>TileCollisionDescriptor</code> tiles as impassable</li>
+<li>default to <code>TileKind.movement_cost</code> as the per-tile cost</li>
+<li>support all orientation modes through <code>tile_neighbors()</code>, which dispatches to cardinal, 8-directional, or hex-6 neighborhoods based on <code>TilemapOrientation</code></li>
+</ul>
+<p>Custom policies receive a <code>TilePathStep</code> containing the current map, the queried layer, source and destination coordinates, and the resolved source/destination tile metadata for that layer. This allows callers to implement richer locomotion models, such as consulting a separate collision layer, detail-layer roads, or agent-specific movement rules, without changing the logical tile storage.</p>
+<h3>Design choice</h3>
+<p>Pathfinding operates on the logical model, not on render or collision projections. This means it stays usable even when rendering is disabled or collision chunks have not been synced yet.</p>
+<h2>Fill helpers</h2>
+<p>The <code>Tilemap</code> struct provides three fill methods for common editing operations:</p>
+<ul>
+<li><code>fill_circle</code> — fills all tiles within a Euclidean radius</li>
+<li><code>fill_line</code> — Bresenham line rasterization between two tile coordinates</li>
+<li><code>flood_fill</code> — BFS flood fill from a starting tile, replacing matching tiles up to a configurable safety limit</li>
+</ul>
+<p>These are also exposed as <code>TilemapCommand</code> variants (<code>FillCircle</code>, <code>FillLine</code>, <code>FloodFill</code>) for message-driven usage through <code>MessageWriter&lt;TilemapCommand&gt;</code>.</p>
+<h2>What is intentionally not in the core runtime</h2>
+<ul>
+<li>sparse storage</li>
+<li>streaming activation or chunk culling</li>
+<li>physics backend bindings</li>
+<li>navmesh or visibility baking</li>
+<li>save/load formats</li>
+</ul>
+<p>Tiled JSON translation now ships directly in the crate as a normalized import boundary. LDtk parsing and editor-specific scene/entity instantiation still stay outside the core runtime.</p>
+<p>Those are useful adapter layers, but they are not part of the durable core runtime contract in <code>0.1.0</code>.</p>
+<!----></article> <!----><!--]--><!----> <!--[-1--><!--]--><!----></div></section><!----></div></div><!----></div> <aside class="hidden xl:block xl:w-full xl:py-8 xl:pr-4 xl:pl-4" aria-label="Table of contents and document actions"><div class="sticky top-8 flex h-full max-h-[calc(100dvh-4rem)] min-h-0 flex-col"><!--[0--><div class="min-h-0 flex-1"><div class="contents"><!--[-1--><div class="hidden text-sm tracking-normal text-foreground-muted/70 lg:block">No headings</div><!--]--></div><!----></div><!--]--> <!--[0--><!--[0--><div class="mt-auto"><div class="flex flex-col gap-1 text-sm"><!--[0--><button type="button" aria-live="polite" aria-disabled="false" class="group/option flex items-center gap-2 overflow-hidden rounded-sm px-3 py-1.5 text-left font-medium tracking-normal text-foreground-muted transition-colors duration-150 ease-out hover:bg-background-muted hover:text-foreground"><span class="grid" style="grid-template-areas: 'content';"><!----><span class="flex items-center gap-2" style="grid-area: content;"><!--[-1--><svg role="img" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4 flex-none"><title>Markdown</title><path class="stroke-current" d="M1.212 5.5h21.576c.407 0 .712.317.712.679v11.549a.695.695 0 0 1-.712.677H1.212a.695.695 0 0 1-.712-.678V6.18c0-.362.305-.679.712-.679Z"></path><path class="fill-current" d="M3.03 15.96V7.946h2.425l2.424 2.946 2.424-2.946h2.424v8.014h-2.424v-4.596L7.88 14.31l-2.424-2.946v4.596H3.03Zm15.152 0-3.636-3.89h2.424V7.947h2.424v4.125h2.424l-3.636 3.889Z"></path></svg><!--]--> <span>Copy as Markdown</span></span><!----></span></button><!--]--> <!--[0--><a class="group/option flex items-center gap-2 rounded-sm px-3 py-1.5 text-left font-medium tracking-normal text-foreground-muted transition-colors duration-150 ease-out hover:bg-background-muted hover:text-foreground" href="https://github.com/julien-blanchon/saddle-world-tilemap/blob/main/docs//saddle-world-tilemap/docs/architecture.md" target="_blank" rel="noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 flex-none"><!--[-1--><!--]--><path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"></path></svg><!----> <span>Open in GitHub</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="ml-auto size-4 flex-none"><!--[-1--><!--]--><path d="M26,28H6a2.0027,2.0027,0,0,1-2-2V6A2.0027,2.0027,0,0,1,6,4H16V6H6V26H26V16h2V26A2.0027,2.0027,0,0,1,26,28Z"></path><path d="M20 2 20 4 26.586 4 18 12.586 19.414 14 28 5.414 28 12 30 12 30 2 20 2z"></path></svg><!----> <span class="sr-only">(opens in a new tab)</span></a><!--]--> <!--[-1--><!--]--> <!--[-1--><!--]--></div></div><!--]--><!--]--></div></aside></div></main><!--]--><!--]--><!----> <!--[0--><!--[-1--><!--]--><!--]--><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_erc2oq = {
+						base: new URL("../..", location).pathname.slice(0, -1),
+						assets: "/saddle-world-tilemap"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../../_app/immutable/entry/start.CtGtx6Gf.js"),
+						import("../../_app/immutable/entry/app.DVd2v-hi.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 5],
+							data: [null,null,{type:"data",data:{html:"\u003Ch2>Design goals\u003C/h2>\n\u003Cp>\u003Ccode>saddle-world-tilemap\u003C/code> is built around four rules:\u003C/p>\n\u003Col>\n\u003Cli>logical tile storage is the source of truth\u003C/li>\n\u003Cli>render chunks and collision chunks are projections of that logical state\u003C/li>\n\u003Cli>runtime edits stay localized through dirty-chunk tracking\u003C/li>\n\u003Cli>coordinate conversion remains explicit and testable\u003C/li>\n\u003C/ol>\n\u003Ch2>Main runtime split\u003C/h2>\n\u003Ch3>Logical model\u003C/h3>\n\u003Cp>The public logical model is:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>Tilemap\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileLayerState\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileChunk\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileCatalog\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileKind\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileCell\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>\u003Ccode>Tilemap\u003C/code> owns:\u003C/p>\n\u003Cul>\n\u003Cli>map geometry\u003C/li>\n\u003Cli>chunk size\u003C/li>\n\u003Cli>stable layer IDs\u003C/li>\n\u003Cli>the per-layer chunk store\u003C/li>\n\u003C/ul>\n\u003Cp>\u003Ccode>TileLayerState\u003C/code> owns:\u003C/p>\n\u003Cul>\n\u003Cli>the layer config\u003C/li>\n\u003Cli>the catalog for that layer\u003C/li>\n\u003Cli>dense chunk-local tile storage\u003C/li>\n\u003Cli>dirty sets for resolve, render, and collision\u003C/li>\n\u003C/ul>\n\u003Cp>The logical model never stores render entities directly.\u003C/p>\n\u003Ch3>Runtime projection state\u003C/h3>\n\u003Cp>Internal runtime state lives in \u003Ccode>TilemapRuntimeComponent\u003C/code> and tracks:\u003C/p>\n\u003Cul>\n\u003Cli>spawned layer nodes\u003C/li>\n\u003Cli>spawned render chunk entities\u003C/li>\n\u003Cli>spawned collision chunk entities\u003C/li>\n\u003Cli>animation playback state per animated tile kind\u003C/li>\n\u003C/ul>\n\u003Cp>This runtime cache is rebuildable. Deactivation clears it and leaves the logical tile state intact.\u003C/p>\n\u003Ch2>System pipeline\u003C/h2>\n\u003Cp>\u003Ccode>TilemapSystems\u003C/code> describes the intended frame order:\u003C/p>\n\u003Col>\n\u003Cli>\u003Ccode>Prepare\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>ApplyCommands\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>AdvanceAnimation\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>ResolveAutotiling\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>SyncCollision\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>SyncRender\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>Debug\u003C/code>\u003C/li>\n\u003C/ol>\n\u003Ch3>\u003Ccode>Prepare\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>ensures every map root has runtime state\u003C/li>\n\u003Cli>spawns layer nodes lazily\u003C/li>\n\u003Cli>initializes diagnostics\u003C/li>\n\u003Cli>marks the full map dirty on first activation\u003C/li>\n\u003C/ul>\n\u003Ch3>\u003Ccode>ApplyCommands\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>consumes \u003Ccode>TilemapCommand\u003C/code>\u003C/li>\n\u003Cli>mutates logical tiles only\u003C/li>\n\u003Cli>emits \u003Ccode>TileChanged\u003C/code> and \u003Ccode>LayerVisibilityChanged\u003C/code>\u003C/li>\n\u003Cli>marks the edited chunk, and neighboring chunks when autotile groups are involved\u003C/li>\n\u003C/ul>\n\u003Ch3>\u003Ccode>AdvanceAnimation\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>advances per-kind animation clocks\u003C/li>\n\u003Cli>marks only chunks containing the animated kind dirty when the visible frame changes\u003C/li>\n\u003Cli>emits \u003Ccode>TileAnimationLooped\u003C/code> when a clip wraps\u003C/li>\n\u003C/ul>\n\u003Cp>Animation is definition-driven. The system never creates one timer per tile entity.\u003C/p>\n\u003Ch3>\u003Ccode>ResolveAutotiling\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>walks dirty logical chunks\u003C/li>\n\u003Cli>resolves each tile into:\u003Cul>\n\u003Cli>final atlas index\u003C/li>\n\u003Cli>tint/orientation\u003C/li>\n\u003Cli>collision descriptor\u003C/li>\n\u003Cli>animated-kind membership\u003C/li>\n\u003C/ul>\n\u003C/li>\n\u003Cli>increments the chunk revision\u003C/li>\n\u003Cli>forwards the chunk to render and collision sync stages\u003C/li>\n\u003C/ul>\n\u003Cp>Autotiling uses reusable rule sets keyed by \u003Ccode>AutotileRuleSetId\u003C/code>. The core implementation currently ships bitmask-style matching for cardinal or Moore neighborhoods.\u003C/p>\n\u003Ch3>\u003Ccode>SyncCollision\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>rebuilds \u003Ccode>TilemapCollisionChunk\u003C/code> components from resolved descriptors\u003C/li>\n\u003Cli>despawns empty collision chunks\u003C/li>\n\u003Cli>keeps collision output generic and backend-agnostic\u003C/li>\n\u003C/ul>\n\u003Cp>The crate deliberately stops at descriptors. A physics integration layer can translate them into colliders later.\u003C/p>\n\u003Ch3>\u003Ccode>SyncRender\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>rebuilds one mesh per dirty chunk per visual layer\u003C/li>\n\u003Cli>keeps layer ordering and visibility on the layer node\u003C/li>\n\u003Cli>uses chunk-local mesh projection based on \u003Ccode>TilemapGeometry\u003C/code>\u003C/li>\n\u003Cli>skips itself automatically when the app has no mesh/material asset resources, so logic-only or headless integrations can keep the rest of the runtime active\u003C/li>\n\u003C/ul>\n\u003Cp>The current backend is a simple internal chunk mesh builder using \u003Ccode>Mesh2d\u003C/code> and \u003Ccode>ColorMaterial\u003C/code>. The public crate surface does not expose the renderer internals so this can evolve later.\u003C/p>\n\u003Ch3>\u003Ccode>Debug\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>draws chunk bounds and dirty chunks through gizmos when \u003Ccode>GizmoPlugin\u003C/code> is present\u003C/li>\n\u003Cli>stays optional and data-driven through \u003Ccode>TilemapDebugSettings\u003C/code> and \u003Ccode>TilemapDebugOverlay\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch2>Chunk lifecycle\u003C/h2>\n\u003Col>\n\u003Cli>logical edits create or mutate \u003Ccode>TileChunk\u003C/code>\u003C/li>\n\u003Cli>the layer marks the chunk dirty\u003C/li>\n\u003Cli>resolution computes final visual and collision snapshots\u003C/li>\n\u003Cli>sync stages spawn or update chunk entities\u003C/li>\n\u003Cli>empty chunks despawn their render and collision projections\u003C/li>\n\u003C/ol>\n\u003Cp>Chunk coordinates are stable through \u003Ccode>ChunkCoord\u003C/code>. Tile-to-chunk math uses Euclidean division so negative coordinates remain coherent.\u003C/p>\n\u003Ch2>Coordinate architecture\u003C/h2>\n\u003Cp>\u003Ccode>TilemapGeometry\u003C/code> is the only place that knows how a logical tile maps into local or world space.\u003C/p>\n\u003Cp>Current modes:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>Square\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>IsometricDiamond\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>HexPointyColumns\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>HexFlatRows\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>The same public helpers are used for:\u003C/p>\n\u003Cul>\n\u003Cli>tile placement\u003C/li>\n\u003Cli>cursor picking\u003C/li>\n\u003Cli>world-to-tile conversion\u003C/li>\n\u003Cli>chunk debug rectangles\u003C/li>\n\u003C/ul>\n\u003Cp>This keeps authored content, procedural generation, and runtime picking on the same math path.\u003C/p>\n\u003Ch2>Pathfinding\u003C/h2>\n\u003Cp>The crate includes two standalone pathfinding functions that operate directly on the logical tile model:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>find_path\u003C/code> — A* search on a named tile layer, returning the optimal path as a \u003Ccode>Vec&lt;TileCoord&gt;\u003C/code> with total accumulated cost\u003C/li>\n\u003Cli>\u003Ccode>reachable_tiles\u003C/code> — Dijkstra flood from a starting tile, returning all tiles reachable within a cost budget\u003C/li>\n\u003C/ul>\n\u003Cp>Both are convenience wrappers over:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>find_path_with_policy\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>reachable_tiles_with_policy\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilePathPolicy\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilePathStep\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilePathCallbacks\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>Both functions:\u003C/p>\n\u003Cul>\n\u003Cli>read tile data from \u003Ccode>TileLayerState\u003C/code> without spawning entities\u003C/li>\n\u003Cli>require the destination tile to exist on the queried layer under the built-in policy\u003C/li>\n\u003Cli>default to \u003Ccode>TileKindPathPolicy\u003C/code>, which treats same-layer \u003Ccode>TileCollisionDescriptor\u003C/code> tiles as impassable\u003C/li>\n\u003Cli>default to \u003Ccode>TileKind.movement_cost\u003C/code> as the per-tile cost\u003C/li>\n\u003Cli>support all orientation modes through \u003Ccode>tile_neighbors()\u003C/code>, which dispatches to cardinal, 8-directional, or hex-6 neighborhoods based on \u003Ccode>TilemapOrientation\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>Custom policies receive a \u003Ccode>TilePathStep\u003C/code> containing the current map, the queried layer, source and destination coordinates, and the resolved source/destination tile metadata for that layer. This allows callers to implement richer locomotion models, such as consulting a separate collision layer, detail-layer roads, or agent-specific movement rules, without changing the logical tile storage.\u003C/p>\n\u003Ch3>Design choice\u003C/h3>\n\u003Cp>Pathfinding operates on the logical model, not on render or collision projections. This means it stays usable even when rendering is disabled or collision chunks have not been synced yet.\u003C/p>\n\u003Ch2>Fill helpers\u003C/h2>\n\u003Cp>The \u003Ccode>Tilemap\u003C/code> struct provides three fill methods for common editing operations:\u003C/p>\n\u003Cul>\n\u003Cli>\u003Ccode>fill_circle\u003C/code> — fills all tiles within a Euclidean radius\u003C/li>\n\u003Cli>\u003Ccode>fill_line\u003C/code> — Bresenham line rasterization between two tile coordinates\u003C/li>\n\u003Cli>\u003Ccode>flood_fill\u003C/code> — BFS flood fill from a starting tile, replacing matching tiles up to a configurable safety limit\u003C/li>\n\u003C/ul>\n\u003Cp>These are also exposed as \u003Ccode>TilemapCommand\u003C/code> variants (\u003Ccode>FillCircle\u003C/code>, \u003Ccode>FillLine\u003C/code>, \u003Ccode>FloodFill\u003C/code>) for message-driven usage through \u003Ccode>MessageWriter&lt;TilemapCommand&gt;\u003C/code>.\u003C/p>\n\u003Ch2>What is intentionally not in the core runtime\u003C/h2>\n\u003Cul>\n\u003Cli>sparse storage\u003C/li>\n\u003Cli>streaming activation or chunk culling\u003C/li>\n\u003Cli>physics backend bindings\u003C/li>\n\u003Cli>navmesh or visibility baking\u003C/li>\n\u003Cli>save/load formats\u003C/li>\n\u003C/ul>\n\u003Cp>Tiled JSON translation now ships directly in the crate as a normalized import boundary. LDtk parsing and editor-specific scene/entity instantiation still stay outside the core runtime.\u003C/p>\n\u003Cp>Those are useful adapter layers, but they are not part of the durable core runtime contract in \u003Ccode>0.1.0\u003C/code>.\u003C/p>\n",title:"`saddle-world-tilemap` Architecture",description:"`saddle-world-tilemap` Architecture documentation",rawMarkdown:"## Design goals\n\n`saddle-world-tilemap` is built around four rules:\n\n1. logical tile storage is the source of truth\n2. render chunks and collision chunks are projections of that logical state\n3. runtime edits stay localized through dirty-chunk tracking\n4. coordinate conversion remains explicit and testable\n\n## Main runtime split\n\n### Logical model\n\nThe public logical model is:\n\n- `Tilemap`\n- `TileLayerState`\n- `TileChunk`\n- `TileCatalog`\n- `TileKind`\n- `TileCell`\n\n`Tilemap` owns:\n\n- map geometry\n- chunk size\n- stable layer IDs\n- the per-layer chunk store\n\n`TileLayerState` owns:\n\n- the layer config\n- the catalog for that layer\n- dense chunk-local tile storage\n- dirty sets for resolve, render, and collision\n\nThe logical model never stores render entities directly.\n\n### Runtime projection state\n\nInternal runtime state lives in `TilemapRuntimeComponent` and tracks:\n\n- spawned layer nodes\n- spawned render chunk entities\n- spawned collision chunk entities\n- animation playback state per animated tile kind\n\nThis runtime cache is rebuildable. Deactivation clears it and leaves the logical tile state intact.\n\n## System pipeline\n\n`TilemapSystems` describes the intended frame order:\n\n1. `Prepare`\n2. `ApplyCommands`\n3. `AdvanceAnimation`\n4. `ResolveAutotiling`\n5. `SyncCollision`\n6. `SyncRender`\n7. `Debug`\n\n### `Prepare`\n\n- ensures every map root has runtime state\n- spawns layer nodes lazily\n- initializes diagnostics\n- marks the full map dirty on first activation\n\n### `ApplyCommands`\n\n- consumes `TilemapCommand`\n- mutates logical tiles only\n- emits `TileChanged` and `LayerVisibilityChanged`\n- marks the edited chunk, and neighboring chunks when autotile groups are involved\n\n### `AdvanceAnimation`\n\n- advances per-kind animation clocks\n- marks only chunks containing the animated kind dirty when the visible frame changes\n- emits `TileAnimationLooped` when a clip wraps\n\nAnimation is definition-driven. The system never creates one timer per tile entity.\n\n### `ResolveAutotiling`\n\n- walks dirty logical chunks\n- resolves each tile into:\n  - final atlas index\n  - tint/orientation\n  - collision descriptor\n  - animated-kind membership\n- increments the chunk revision\n- forwards the chunk to render and collision sync stages\n\nAutotiling uses reusable rule sets keyed by `AutotileRuleSetId`. The core implementation currently ships bitmask-style matching for cardinal or Moore neighborhoods.\n\n### `SyncCollision`\n\n- rebuilds `TilemapCollisionChunk` components from resolved descriptors\n- despawns empty collision chunks\n- keeps collision output generic and backend-agnostic\n\nThe crate deliberately stops at descriptors. A physics integration layer can translate them into colliders later.\n\n### `SyncRender`\n\n- rebuilds one mesh per dirty chunk per visual layer\n- keeps layer ordering and visibility on the layer node\n- uses chunk-local mesh projection based on `TilemapGeometry`\n- skips itself automatically when the app has no mesh/material asset resources, so logic-only or headless integrations can keep the rest of the runtime active\n\nThe current backend is a simple internal chunk mesh builder using `Mesh2d` and `ColorMaterial`. The public crate surface does not expose the renderer internals so this can evolve later.\n\n### `Debug`\n\n- draws chunk bounds and dirty chunks through gizmos when `GizmoPlugin` is present\n- stays optional and data-driven through `TilemapDebugSettings` and `TilemapDebugOverlay`\n\n## Chunk lifecycle\n\n1. logical edits create or mutate `TileChunk`\n2. the layer marks the chunk dirty\n3. resolution computes final visual and collision snapshots\n4. sync stages spawn or update chunk entities\n5. empty chunks despawn their render and collision projections\n\nChunk coordinates are stable through `ChunkCoord`. Tile-to-chunk math uses Euclidean division so negative coordinates remain coherent.\n\n## Coordinate architecture\n\n`TilemapGeometry` is the only place that knows how a logical tile maps into local or world space.\n\nCurrent modes:\n\n- `Square`\n- `IsometricDiamond`\n- `HexPointyColumns`\n- `HexFlatRows`\n\nThe same public helpers are used for:\n\n- tile placement\n- cursor picking\n- world-to-tile conversion\n- chunk debug rectangles\n\nThis keeps authored content, procedural generation, and runtime picking on the same math path.\n\n## Pathfinding\n\nThe crate includes two standalone pathfinding functions that operate directly on the logical tile model:\n\n- `find_path` — A* search on a named tile layer, returning the optimal path as a `Vec\u003CTileCoord>` with total accumulated cost\n- `reachable_tiles` — Dijkstra flood from a starting tile, returning all tiles reachable within a cost budget\n\nBoth are convenience wrappers over:\n\n- `find_path_with_policy`\n- `reachable_tiles_with_policy`\n- `TilePathPolicy`\n- `TilePathStep`\n- `TilePathCallbacks`\n\nBoth functions:\n\n- read tile data from `TileLayerState` without spawning entities\n- require the destination tile to exist on the queried layer under the built-in policy\n- default to `TileKindPathPolicy`, which treats same-layer `TileCollisionDescriptor` tiles as impassable\n- default to `TileKind.movement_cost` as the per-tile cost\n- support all orientation modes through `tile_neighbors()`, which dispatches to cardinal, 8-directional, or hex-6 neighborhoods based on `TilemapOrientation`\n\nCustom policies receive a `TilePathStep` containing the current map, the queried layer, source and destination coordinates, and the resolved source/destination tile metadata for that layer. This allows callers to implement richer locomotion models, such as consulting a separate collision layer, detail-layer roads, or agent-specific movement rules, without changing the logical tile storage.\n\n### Design choice\n\nPathfinding operates on the logical model, not on render or collision projections. This means it stays usable even when rendering is disabled or collision chunks have not been synced yet.\n\n## Fill helpers\n\nThe `Tilemap` struct provides three fill methods for common editing operations:\n\n- `fill_circle` — fills all tiles within a Euclidean radius\n- `fill_line` — Bresenham line rasterization between two tile coordinates\n- `flood_fill` — BFS flood fill from a starting tile, replacing matching tiles up to a configurable safety limit\n\nThese are also exposed as `TilemapCommand` variants (`FillCircle`, `FillLine`, `FloodFill`) for message-driven usage through `MessageWriter\u003CTilemapCommand>`.\n\n## What is intentionally not in the core runtime\n\n- sparse storage\n- streaming activation or chunk culling\n- physics backend bindings\n- navmesh or visibility baking\n- save/load formats\n\nTiled JSON translation now ships directly in the crate as a normalized import boundary. LDtk parsing and editor-specific scene/entity instantiation still stay outside the core runtime.\n\nThose are useful adapter layers, but they are not part of the durable core runtime contract in `0.1.0`.\n",slug:"architecture"},uses:{params:["slug"]}}],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>

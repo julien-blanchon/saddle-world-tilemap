@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(() => {
+				document.documentElement.classList.add('js');
+				const storageKey = 'docs-theme';
+				const storedTheme = localStorage.getItem(storageKey);
+				const isDark =
+					storedTheme === 'dark' ||
+					(storedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+				document.documentElement.classList.toggle('dark', isDark);
+				document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+			})();
+		</script>
+		<link href="../../_app/immutable/entry/start.CtGtx6Gf.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DodK7cH3.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D6rU7RKI.js" rel="modulepreload">
+		<link href="../../_app/immutable/entry/app.DVd2v-hi.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D2PL5qU_.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/DsnmJJEf.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/CGbRUU1n.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/0.DLZvDGnE.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Dh9VjZ81.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/Dy2H2_Kx.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/D3udy8KQ.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/2.B7p_b4PW.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/B2Agp9hA.js" rel="modulepreload">
+		<link href="../../_app/immutable/nodes/5.BOp3_yHr.js" rel="modulepreload">
+		<link href="../../_app/immutable/chunks/O7QY0ZL7.js" rel="modulepreload">
+		<!--12qhfyh--><meta name="theme-color" content="#ffffff"/> <link rel="icon" type="image/svg+xml" href="../../favicon.svg"/> <meta name="description" content="Reusable chunk-based tilemap toolkit for Bevy"/><!----><!--1bpnej--><!--[0--><meta name="description" content="`saddle-world-tilemap` Configuration documentation"/><!--]--><!----><title>`saddle-world-tilemap` Configuration - saddle-world-tilemap</title>
+		<link href="../../_app/immutable/assets/manifest.DAGDUwuc.css" rel="stylesheet">
+		<link href="../../_app/immutable/assets/0.Cu___w4E.css" rel="stylesheet">
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents"><!--[--><!--[0--><!--[--><!--[0--><!--[--><main class="relative h-dvh bg-background text-foreground"><div class="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-border bg-background px-4 py-1.5 lg:hidden"><a href="../../" class="inline-flex items-center gap-1 px-2 py-2 text-sm tracking-tight text-foreground"><span class="font-medium tracking-tight text-foreground">saddle-world-tilemap</span></a> <button class="-mr-2 inline-flex size-10 items-center justify-center gap-2 rounded-sm text-sm whitespace-nowrap text-foreground transition-colors duration-150 ease-out hover:bg-background-muted lg:hidden" aria-label="Toggle menu"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="20" height="20" aria-hidden="true"><!--[-1--><!--]--><path d="M4 6H28V8H4z"></path><path d="M4 24H28V26H4z"></path><path d="M4 12H28V14H4z"></path><path d="M4 18H28V20H4z"></path></svg><!----></button></div> <!--[-1--><!--]--><!----> <div class="flex h-full w-full min-w-0 lg:grid lg:grid-cols-[22rem_minmax(0,1fr)] lg:pr-4 xl:grid-cols-[22rem_minmax(0,56rem)_18rem] xl:justify-center"><div class="hidden lg:block"><aside class="flex h-dvh flex-col bg-background" aria-label="Documentation sidebar"><div class="flex flex-col gap-4 p-4"><a href="../../" class="flex items-center gap-2"><span class="text-xl font-medium tracking-tight text-foreground">saddle-world-tilemap</span></a> <!--[0--><button type="button" class="group inset-shadow relative flex h-9 w-full items-center gap-2 rounded-sm bg-background-inset px-3 py-1.5 text-sm font-medium text-foreground-muted/70 transition-[color] duration-150 ease-out hover:text-foreground-muted"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="text-foreground-muted/70"><!--[-1--><!--]--><path d="M29,27.5859l-7.5521-7.5521a11.0177,11.0177,0,1,0-1.4141,1.4141L27.5859,29ZM4,13a9,9,0,1,1,9,9A9.01,9.01,0,0,1,4,13Z"></path></svg><!----> <span class="flex-1 text-left">Search...</span> <!--[0--><kbd class="card pointer-events-none relative hidden h-5 items-center gap-1 rounded-xs bg-background px-1.5 font-mono text-[10px] font-medium text-foreground-muted/70 select-none sm:flex">⌘ K</kbd><!--]--></button><!--]--><!----></div> <div class="relative flex flex-col overflow-hidden flex-1 svelte-1lcbi17"><div class="scrollbar-hide min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto p-4 svelte-1lcbi17" style="mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);"><nav class="flex flex-col space-y-1" aria-label="Documentation pages"><h4 class="mb-2 ml-2 text-xs font-medium tracking-wide text-foreground-muted/70 uppercase">Docs</h4> <!--[--><!--[-1--><a href="../../" class="block rounded-sm px-3 py-1.5 text-sm tracking-normal transition-all duration-150 ease-out text-foreground-muted hover:bg-background-muted hover:text-foreground">Overview</a><!--]--><!--[0--><button class="flex w-full items-center justify-between rounded-sm px-3 py-1.5 text-sm font-medium tracking-normal transition-all duration-150 ease-out hover:bg-background-muted hover:text-foreground text-foreground-muted"><span>Documentation</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 transition-transform duration-150"><!--[-1--><!--]--><path d="M22 16 12 26 10.6 24.6 19.2 16 10.6 7.4 12 6z"></path></svg><!----></button> <!--[-1--><!--]--><!--]--><!--]--></nav><!----></div></div><!----> <div class="flex items-center gap-1 p-4"><!--[0--><button type="button" class="group transition-scale inset-shadow relative inline-flex size-7 items-center justify-center rounded-sm bg-background-inset text-foreground duration-150 ease-out active:scale-[0.95]" aria-label="Switch to dark mode"><span class="sr-only">Switch to dark mode</span> <span class="transition-transform duration-150 ease-out"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true"><!--[-1--><!--]--><path d="M16,12a4,4,0,1,1-4,4,4.0045,4.0045,0,0,1,4-4m0-2a6,6,0,1,0,6,6,6,6,0,0,0-6-6Z" transform="translate(0 .005)"></path><path d="M6.854 5.375H8.854V10.333H6.854z" transform="rotate(-45 7.86 7.856)"></path><path d="M2 15.005H7V17.005000000000003H2z"></path><path d="M5.375 23.147H10.333V25.147H5.375z" transform="rotate(-45 7.86 24.149)"></path><path d="M15 25.005H17V30.005H15z"></path><path d="M23.147 21.668H25.147V26.625999999999998H23.147z" transform="rotate(-45 24.152 24.149)"></path><path d="M25 15.005H30V17.005000000000003H25z"></path><path d="M21.668 6.854H26.625999999999998V8.854H21.668z" transform="rotate(-45 24.152 7.856)"></path><path d="M15 2.005H17V7.005H15z"></path></svg><!----></span> <span class="absolute transition-transform duration-150 ease-out scale-0 blur-[2px]"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true"><!--[-1--><!--]--><path d="M13.5025,5.4136A15.0755,15.0755,0,0,0,25.096,23.6082a11.1134,11.1134,0,0,1-7.9749,3.3893c-.1385,0-.2782.0051-.4178,0A11.0944,11.0944,0,0,1,13.5025,5.4136M14.98,3a1.0024,1.0024,0,0,0-.1746.0156A13.0959,13.0959,0,0,0,16.63,28.9973c.1641.006.3282,0,.4909,0a13.0724,13.0724,0,0,0,10.702-5.5556,1.0094,1.0094,0,0,0-.7833-1.5644A13.08,13.08,0,0,1,15.8892,4.38,1.0149,1.0149,0,0,0,14.98,3Z"></path></svg><!----></span></button><!--]--> <!--[0--><a class="group transition-scale inset-shadow relative inline-flex size-7 cursor-pointer items-center justify-center rounded-sm bg-background-inset text-foreground duration-150 ease-out active:scale-[0.95]" href="https://github.com/julien-blanchon/saddle-world-tilemap" target="_blank" rel="noreferrer" aria-label="Open project repository (opens in a new tab)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 flex-none"><!--[-1--><!--]--><path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"></path></svg><!----></a><!--]--></div></aside><!----></div> <div class="inset-shadow relative mx-auto h-full w-full max-w-4xl min-w-0 overflow-hidden border border-border bg-background-inset pt-12 lg:my-4 lg:max-h-[calc(100dvh-2rem)] lg:overflow-visible lg:rounded-xl lg:pt-0"><div class="relative flex flex-col overflow-hidden mx-auto h-full w-full lg:max-h-[calc(100dvh-2rem)] svelte-1lcbi17"><div id="docs-content-container" class="scrollbar-hide min-h-0 w-full flex-1 overflow-x-hidden overflow-y-auto rounded-lg overscroll-none flex flex-col gap-8 px-4 py-8 lg:px-8 svelte-1lcbi17" style="mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent); -webkit-mask-image: linear-gradient(to bottom, transparent, black 16px, black calc(100% - 16px), transparent);"><section class="min-w-0 flex-1 space-y-8"><div class="space-y-4"><!--[-1--><!--]--> <h1 class="scroll-m-20 text-3xl font-medium tracking-tight text-foreground">`saddle-world-tilemap` Configuration</h1> <!--[0--><p class="max-w-4xl text-base font-normal tracking-normal text-foreground-muted">`saddle-world-tilemap` Configuration documentation</p><!--]--> <!--[0--><!--[0--><div class="relative z-20 mt-8 flex w-full gap-2 lg:hidden"><!--[0--><div class="inset-shadow w-full rounded-md bg-background-inset p-1.5"><button type="button" aria-live="polite" aria-disabled="false" class="card relative inline-flex h-9 w-full font-medium shrink-0 overflow-hidden items-center justify-center gap-2 rounded-sm bg-background px-4 py-2 text-sm whitespace-nowrap text-foreground transition-[background-color] duration-150 ease-out hover:bg-background-muted disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=size-])]:size-4 flex-1"><span class="grid place-items-center" style="grid-template-areas: 'content';"><!----><span class="flex items-center gap-2 font-medium tracking-normal text-foreground will-change-transform" style="grid-area: content;"><!--[-1--><svg role="img" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4 flex-none"><title>Markdown</title><path class="stroke-current" d="M1.212 5.5h21.576c.407 0 .712.317.712.679v11.549a.695.695 0 0 1-.712.677H1.212a.695.695 0 0 1-.712-.678V6.18c0-.362.305-.679.712-.679Z"></path><path class="fill-current" d="M3.03 15.96V7.946h2.425l2.424 2.946 2.424-2.946h2.424v8.014h-2.424v-4.596L7.88 14.31l-2.424-2.946v4.596H3.03Zm15.152 0-3.636-3.89h2.424V7.947h2.424v4.125h2.424l-3.636 3.889Z"></path></svg><!--]--> <span>Copy Markdown</span></span><!----></span></button></div><!--]--> <!--[0--><div class="inset-shadow relative rounded-md bg-background-inset p-1.5"><button id="mobile-doc-actions-menu-trigger" type="button" class="card relative inline-flex h-9 w-full font-medium shrink-0 overflow-hidden items-center justify-center gap-2 rounded-sm bg-background px-4 py-2 text-sm whitespace-nowrap text-foreground transition-[background-color] duration-150 ease-out hover:bg-background-muted disabled:pointer-events-none disabled:opacity-50 has-[>svg]:px-3 [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 [&amp;_svg:not([class*=size-])]:size-4 flex-1 w-auto! px-2.5!" aria-label="More actions" aria-haspopup="menu" aria-controls="mobile-doc-actions-menu" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4"><!--[-1--><!--]--><circle cx="8" cy="16" r="2"></circle><circle cx="16" cy="16" r="2"></circle><circle cx="24" cy="16" r="2"></circle></svg><!----></button> <!--[-1--><!--]--></div><!--]--></div><!--]--><!--]--></div> <hr class="text-border"/> <div><!--[--><article data-doc-content="" class="w-full max-w-4xl"><!----><h2><code>TilemapPlugin</code></h2>
+<p>Runtime integration surface for logical maps, chunk sync, animation, and debug drawing.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>activate_schedule: Interned&lt;dyn ScheduleLabel&gt;</code></li>
+<li><code>deactivate_schedule: Interned&lt;dyn ScheduleLabel&gt;</code></li>
+<li><code>update_schedule: Interned&lt;dyn ScheduleLabel&gt;</code></li>
+<li><code>debug_settings: TilemapDebugSettings</code></li>
+</ul>
+<h3>Constructors</h3>
+<ul>
+<li><code>TilemapPlugin::new(activate, deactivate, update)</code></li>
+<li><code>TilemapPlugin::always_on(update)</code></li>
+<li><code>TilemapPlugin::default()</code> which is equivalent to <code>always_on(Update)</code></li>
+<li><code>with_debug_settings(TilemapDebugSettings)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>use <code>new(...)</code> for state-scoped gameplay or tool modes</li>
+<li>use <code>always_on(Update)</code> for examples, editors, or always-live world tooling</li>
+<li>if <code>GizmoPlugin</code> is not present, the debug draw system is skipped automatically</li>
+<li>if render asset resources are not available, render chunk sync is skipped automatically and the logical/collision runtime still works</li>
+</ul>
+<h2><code>TilemapGeometry</code></h2>
+<p>Controls tile placement, world conversion, and chunk bounds.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>orientation: TilemapOrientation</code></li>
+<li><code>grid_size: Vec2</code></li>
+<li><code>tile_render_size: Vec2</code></li>
+<li><code>origin: Vec2</code></li>
+<li><code>row_direction: TileRowDirection</code></li>
+</ul>
+<h3>Constructors</h3>
+<ul>
+<li><code>TilemapGeometry::square(tile_size)</code></li>
+<li><code>TilemapGeometry::isometric_diamond(tile_render_size)</code></li>
+<li><code>TilemapGeometry::hex_pointy_columns(tile_render_size, TilemapHexParity)</code></li>
+<li><code>TilemapGeometry::hex_flat_rows(tile_render_size, TilemapHexParity)</code></li>
+</ul>
+<h3>Orientation variants</h3>
+<ul>
+<li><code>TilemapOrientation::Square</code></li>
+<li><code>TilemapOrientation::IsometricDiamond</code></li>
+<li><code>TilemapOrientation::HexPointyColumns(TilemapHexParity)</code></li>
+<li><code>TilemapOrientation::HexFlatRows(TilemapHexParity)</code></li>
+</ul>
+<h3><code>TilemapHexParity</code></h3>
+<ul>
+<li><code>TilemapHexParity::Odd</code></li>
+<li><code>TilemapHexParity::Even</code></li>
+</ul>
+<h3>Builders</h3>
+<ul>
+<li><code>with_origin(Vec2)</code></li>
+<li><code>with_row_direction(TileRowDirection)</code></li>
+<li><code>with_tile_render_size(Vec2)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>keep <code>grid_size.x &gt; 0.0</code> and <code>grid_size.y &gt; 0.0</code></li>
+<li>for square maps, <code>grid_size</code> and <code>tile_render_size</code> usually match</li>
+<li>for isometric maps, <code>grid_size</code> should stay half-width and half-height of the rendered diamond unless you are intentionally stretching or overlapping tiles</li>
+<li>for pointy-column hex maps, <code>tile_render_size</code> should match the full rendered hex footprint and parity should match the source data layout</li>
+<li>for flat-row hex maps, <code>tile_render_size</code> should match the full rendered hex footprint and parity should match the source data layout</li>
+<li><code>row_direction = Down</code> matches common 2D screen-space conventions</li>
+</ul>
+<h2><code>Tilemap</code></h2>
+<p>Top-level logical map component.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>geometry: TilemapGeometry</code></li>
+<li><code>chunk_size: UVec2</code></li>
+<li><code>layers: BTreeMap&lt;TileLayerId, TileLayerState&gt;</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>chunk sizes between <code>8x8</code> and <code>32x32</code> are the practical starting range</li>
+<li>smaller chunks reduce the cost of isolated edits</li>
+<li>larger chunks reduce entity and mesh counts for mostly static maps</li>
+</ul>
+<h2><code>TileLayerConfig</code></h2>
+<p>Per-layer authored configuration.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>id: TileLayerId</code></li>
+<li><code>name: String</code></li>
+<li><code>visible: bool</code></li>
+<li><code>offset: Vec2</code></li>
+<li><code>render: Option&lt;TileLayerRenderConfig&gt;</code></li>
+</ul>
+<h3>Constructors</h3>
+<ul>
+<li><code>TileLayerConfig::visual(id, name, render)</code></li>
+<li><code>TileLayerConfig::logic_only(id, name)</code></li>
+<li><code>with_offset(Vec2)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>use <code>logic_only(...)</code> for collision, navigation, or metadata layers that should not render</li>
+<li>prefer stable <code>TileLayerId</code> values for persistence or editor adapters</li>
+<li>use <code>offset</code> sparingly; it is best for parallax or overlay alignment, not as a replacement for a coherent map transform</li>
+</ul>
+<h2><code>TileLayerRenderConfig</code></h2>
+<p>Visual settings for a renderable layer.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>atlas: TileAtlasLayout</code></li>
+<li><code>z_index: f32</code></li>
+<li><code>tint: Color</code></li>
+<li><code>alpha_mode: AlphaMode2d</code></li>
+<li><code>chunk_sort_step: f32</code></li>
+</ul>
+<h3>Defaults</h3>
+<ul>
+<li><code>z_index = 0.0</code></li>
+<li><code>tint = Color::WHITE</code></li>
+<li><code>alpha_mode = AlphaMode2d::Blend</code></li>
+<li><code>chunk_sort_step = 0.0001</code></li>
+</ul>
+<h3>Builders</h3>
+<ul>
+<li><code>with_z_index(f32)</code></li>
+<li><code>with_tint(Color)</code></li>
+<li><code>with_alpha_mode(AlphaMode2d)</code></li>
+<li><code>with_chunk_sort_step(f32)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>use larger <code>z_index</code> values for overlays, highlights, or decals</li>
+<li><code>chunk_sort_step</code> matters for isometric and hex chunk ordering</li>
+<li>transparent oversized art should live on a dedicated layer when you need explicit ordering control</li>
+</ul>
+<h2><code>TileAtlasLayout</code></h2>
+<p>Describes how atlas indices map into UVs.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>image: Handle&lt;Image&gt;</code></li>
+<li><code>texture_size: UVec2</code></li>
+<li><code>tile_size: UVec2</code></li>
+<li><code>columns: u32</code></li>
+<li><code>rows: u32</code></li>
+<li><code>padding: UVec2</code></li>
+<li><code>margin: UVec2</code></li>
+</ul>
+<h3>Constructors and builders</h3>
+<ul>
+<li><code>TileAtlasLayout::from_grid(image, texture_size, tile_size, columns, rows)</code></li>
+<li><code>with_padding(UVec2)</code></li>
+<li><code>with_margin(UVec2)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li><code>columns * rows</code> defines the valid atlas index range</li>
+<li>set <code>padding</code> and <code>margin</code> when importing atlas sheets that were packed with gutters</li>
+<li>prefer nearest sampling in examples or pixel-art workflows</li>
+</ul>
+<h2><code>TileKind</code></h2>
+<p>Reusable tile definition.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>name: String</code></li>
+<li><code>render: TileRenderRule</code></li>
+<li><code>collision: Option&lt;TileCollisionDescriptor&gt;</code></li>
+<li><code>flags: u32</code></li>
+<li><code>movement_cost: u16</code></li>
+</ul>
+<h3>Constructors</h3>
+<ul>
+<li><code>TileKind::static_tile(name, atlas_index)</code></li>
+<li><code>TileKind::animated_tile(name, TileAnimation)</code></li>
+<li><code>TileKind::autotile(name, AutotileBinding)</code></li>
+</ul>
+<h3>Builders</h3>
+<ul>
+<li><code>with_collision(TileCollisionDescriptor)</code></li>
+<li><code>with_flags(u32)</code></li>
+<li><code>with_movement_cost(u16)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>keep tile definitions reusable and data-oriented</li>
+<li>use <code>flags</code> for small shared bitfields, not game-specific object graphs</li>
+<li><code>movement_cost = 1</code> is the intended baseline</li>
+</ul>
+<h2><code>AutotileRuleSet</code></h2>
+<p>Rule table for reusable autotile matching.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>neighborhood: AutotileNeighborhood</code></li>
+<li><code>variants: BTreeMap&lt;u16, u32&gt;</code></li>
+<li><code>fallback_atlas_index: u32</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li><code>Cardinal4</code> fits roads, rivers, walls, and pipe-style connectors</li>
+<li><code>Moore8</code> is more appropriate for full blob or terrain masks</li>
+<li>missing masks fall back to <code>fallback_atlas_index</code></li>
+</ul>
+<h2><code>TileAnimation</code></h2>
+<p>Definition-driven animated tile clip.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>frames: Vec&lt;TileAnimationFrame&gt;</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>frame durations should stay positive</li>
+<li>animation cost scales with the number of chunks containing the animated kind, not the number of tile entities</li>
+</ul>
+<h2><code>TilemapDebugSettings</code></h2>
+<p>Runtime debug resource.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>enabled: bool</code></li>
+<li><code>draw_chunk_bounds: bool</code></li>
+<li><code>draw_dirty_chunks: bool</code></li>
+<li><code>chunk_color: Color</code></li>
+<li><code>dirty_color: Color</code></li>
+<li><code>collision_color: Color</code></li>
+</ul>
+<h3>Defaults</h3>
+<ul>
+<li><code>enabled = false</code></li>
+<li>chunk bounds enabled</li>
+<li>dirty chunk bounds enabled</li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>enable this in labs and sandboxes, not by default in shipping game scenes</li>
+<li>dirty chunk drawing is useful for validating edit locality and animation rebuild scopes</li>
+</ul>
+<h2><code>TilePathOptions</code></h2>
+<p>Options for the A* pathfinding algorithm.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>max_cost: u32</code> — maximum total path cost before giving up. Default: <code>u32::MAX</code></li>
+<li><code>diagonal: bool</code> — whether to allow diagonal movement on square/iso grids. Default: <code>false</code></li>
+</ul>
+<h3>Builders</h3>
+<ul>
+<li><code>with_max_cost(u32)</code></li>
+<li><code>with_diagonal(bool)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>set <code>max_cost</code> to limit search radius for performance or gameplay reasons</li>
+<li><code>diagonal = true</code> allows 8-directional movement; path steps include diagonals</li>
+<li>hex grids ignore the <code>diagonal</code> flag and always use 6 neighbors</li>
+</ul>
+<h2><code>TilePathResult</code></h2>
+<p>Result of a successful pathfinding query.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>path: Vec&lt;TileCoord&gt;</code> — ordered tile coordinates from start to goal (inclusive)</li>
+<li><code>total_cost: u32</code> — accumulated movement cost along the path</li>
+</ul>
+<h2><code>TileKindPathPolicy</code></h2>
+<p>Built-in pathfinding policy used by <code>find_path(...)</code> and <code>reachable_tiles(...)</code>.</p>
+<h3>Behavior</h3>
+<ul>
+<li>destination tiles must exist on the queried layer</li>
+<li>same-layer tiles with <code>TileCollisionDescriptor</code> are impassable</li>
+<li>same-layer <code>TileKind.movement_cost</code> is used as the per-step cost</li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>use this when the queried layer already contains the locomotion metadata you want</li>
+<li>switch to <code>find_path_with_policy(...)</code> or <code>reachable_tiles_with_policy(...)</code> when movement depends on other layers or agent-specific rules</li>
+</ul>
+<h2><code>TilePathStep&lt;&#39;a&gt;</code></h2>
+<p>Context passed into custom <code>TilePathPolicy</code> implementations and <code>TilePathCallbacks</code>.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>map: &amp;Tilemap</code></li>
+<li><code>layer_id: TileLayerId</code></li>
+<li><code>layer: &amp;TileLayerState</code></li>
+<li><code>from: TileCoord</code></li>
+<li><code>to: TileCoord</code></li>
+<li><code>from_tile: Option&lt;&amp;TileCell&gt;</code></li>
+<li><code>from_kind: Option&lt;&amp;TileKind&gt;</code></li>
+<li><code>to_tile: Option&lt;&amp;TileCell&gt;</code></li>
+<li><code>to_kind: Option&lt;&amp;TileKind&gt;</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>inspect <code>to_kind</code> / <code>to_tile</code> for same-layer terrain decisions</li>
+<li>inspect <code>map</code> when passability or cost depends on other layers</li>
+<li>prefer positive movement costs for passable tiles</li>
+</ul>
+<h2><code>TilePathCallbacks</code></h2>
+<p>Closure adapter for custom pathfinding rules.</p>
+<h3>Constructor</h3>
+<ul>
+<li><code>TilePathCallbacks::new(passability, movement_cost)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li>use this for one-off closures in examples, tools, or gameplay systems</li>
+<li>implement <code>TilePathPolicy</code> directly for reusable agent types or locomotion presets</li>
+</ul>
+<h2><code>TiledImportOptions</code></h2>
+<p>Runtime import surface for normalized Tiled JSON ingestion.</p>
+<h3>Fields</h3>
+<ul>
+<li><code>atlas: TileAtlasLayout</code></li>
+<li><code>catalog: TileCatalog</code></li>
+<li><code>gid_to_kind: BTreeMap&lt;u32, TileKindId&gt;</code></li>
+<li><code>chunk_size: UVec2</code></li>
+<li><code>origin: Vec2</code></li>
+<li><code>row_direction: TileRowDirection</code></li>
+<li><code>layer_z_step: f32</code></li>
+<li><code>logic_only_layers: BTreeSet&lt;String&gt;</code></li>
+</ul>
+<h3>Constructor</h3>
+<ul>
+<li><code>TiledImportOptions::new(atlas, catalog, gid_to_kind)</code></li>
+</ul>
+<h3>Guidance</h3>
+<ul>
+<li><code>gid_to_kind</code> should map stripped Tiled global tile IDs, not flip-flagged values</li>
+<li><code>logic_only_layers</code> is useful for collision, nav, and metadata layers that should import but not render</li>
+<li><code>layer_z_step</code> becomes the per-layer <code>z_index</code> increment for imported visual layers</li>
+<li><code>origin</code> and <code>row_direction</code> should match the world-space convention used by the rest of your app</li>
+</ul>
+<h2><code>ImportedTilemapScene</code></h2>
+<h3>Fields</h3>
+<ul>
+<li><code>map: Tilemap</code></li>
+<li><code>object_spawns: Vec&lt;TileObjectSpawn&gt;</code></li>
+</ul>
+<p>The importer intentionally returns normalized object-layer spawn descriptors instead of spawning entities directly. That keeps scene/entity instantiation policy outside the durable tile runtime.</p>
+<!----></article> <!----><!--]--><!----> <!--[-1--><!--]--><!----></div></section><!----></div></div><!----></div> <aside class="hidden xl:block xl:w-full xl:py-8 xl:pr-4 xl:pl-4" aria-label="Table of contents and document actions"><div class="sticky top-8 flex h-full max-h-[calc(100dvh-4rem)] min-h-0 flex-col"><!--[0--><div class="min-h-0 flex-1"><div class="contents"><!--[-1--><div class="hidden text-sm tracking-normal text-foreground-muted/70 lg:block">No headings</div><!--]--></div><!----></div><!--]--> <!--[0--><!--[0--><div class="mt-auto"><div class="flex flex-col gap-1 text-sm"><!--[0--><button type="button" aria-live="polite" aria-disabled="false" class="group/option flex items-center gap-2 overflow-hidden rounded-sm px-3 py-1.5 text-left font-medium tracking-normal text-foreground-muted transition-colors duration-150 ease-out hover:bg-background-muted hover:text-foreground"><span class="grid" style="grid-template-areas: 'content';"><!----><span class="flex items-center gap-2" style="grid-area: content;"><!--[-1--><svg role="img" viewBox="0 0 24 24" fill="none" aria-hidden="true" class="size-4 flex-none"><title>Markdown</title><path class="stroke-current" d="M1.212 5.5h21.576c.407 0 .712.317.712.679v11.549a.695.695 0 0 1-.712.677H1.212a.695.695 0 0 1-.712-.678V6.18c0-.362.305-.679.712-.679Z"></path><path class="fill-current" d="M3.03 15.96V7.946h2.425l2.424 2.946 2.424-2.946h2.424v8.014h-2.424v-4.596L7.88 14.31l-2.424-2.946v4.596H3.03Zm15.152 0-3.636-3.89h2.424V7.947h2.424v4.125h2.424l-3.636 3.889Z"></path></svg><!--]--> <span>Copy as Markdown</span></span><!----></span></button><!--]--> <!--[0--><a class="group/option flex items-center gap-2 rounded-sm px-3 py-1.5 text-left font-medium tracking-normal text-foreground-muted transition-colors duration-150 ease-out hover:bg-background-muted hover:text-foreground" href="https://github.com/julien-blanchon/saddle-world-tilemap/blob/main/docs//saddle-world-tilemap/docs/configuration.md" target="_blank" rel="noreferrer"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="size-4 flex-none"><!--[-1--><!--]--><path fill-rule="evenodd" d="M16,2a14,14,0,0,0-4.43,27.28c.7.13,1-.3,1-.67s0-1.21,0-2.38c-3.89.84-4.71-1.88-4.71-1.88A3.71,3.71,0,0,0,6.24,22.3c-1.27-.86.1-.85.1-.85A2.94,2.94,0,0,1,8.48,22.9a3,3,0,0,0,4.08,1.16,2.93,2.93,0,0,1,.88-1.87c-3.1-.36-6.37-1.56-6.37-6.92a5.4,5.4,0,0,1,1.44-3.76,5,5,0,0,1,.14-3.7s1.17-.38,3.85,1.43a13.3,13.3,0,0,1,7,0c2.67-1.81,3.84-1.43,3.84-1.43a5,5,0,0,1,.14,3.7,5.4,5.4,0,0,1,1.44,3.76c0,5.38-3.27,6.56-6.39,6.91a3.33,3.33,0,0,1,.95,2.59c0,1.87,0,3.38,0,3.84s.25.81,1,.67A14,14,0,0,0,16,2Z"></path></svg><!----> <span>Open in GitHub</span> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" preserveAspectRatio="xMidYMid meet" width="16" height="16" aria-hidden="true" class="ml-auto size-4 flex-none"><!--[-1--><!--]--><path d="M26,28H6a2.0027,2.0027,0,0,1-2-2V6A2.0027,2.0027,0,0,1,6,4H16V6H6V26H26V16h2V26A2.0027,2.0027,0,0,1,26,28Z"></path><path d="M20 2 20 4 26.586 4 18 12.586 19.414 14 28 5.414 28 12 30 12 30 2 20 2z"></path></svg><!----> <span class="sr-only">(opens in a new tab)</span></a><!--]--> <!--[-1--><!--]--> <!--[-1--><!--]--></div></div><!--]--><!--]--></div></aside></div></main><!--]--><!--]--><!----> <!--[0--><!--[-1--><!--]--><!--]--><!--]--><!--]--> <!--[-1--><!--]--><!--]-->
+			
+			<script>
+				{
+					__sveltekit_erc2oq = {
+						base: new URL("../..", location).pathname.slice(0, -1),
+						assets: "/saddle-world-tilemap"
+					};
+
+					const element = document.currentScript.parentElement;
+
+					Promise.all([
+						import("../../_app/immutable/entry/start.CtGtx6Gf.js"),
+						import("../../_app/immutable/entry/app.DVd2v-hi.js")
+					]).then(([kit, app]) => {
+						kit.start(app, element, {
+							node_ids: [0, 2, 5],
+							data: [null,null,{type:"data",data:{html:"\u003Ch2>\u003Ccode>TilemapPlugin\u003C/code>\u003C/h2>\n\u003Cp>Runtime integration surface for logical maps, chunk sync, animation, and debug drawing.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>activate_schedule: Interned&lt;dyn ScheduleLabel&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>deactivate_schedule: Interned&lt;dyn ScheduleLabel&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>update_schedule: Interned&lt;dyn ScheduleLabel&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>debug_settings: TilemapDebugSettings\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Constructors\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TilemapPlugin::new(activate, deactivate, update)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapPlugin::always_on(update)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapPlugin::default()\u003C/code> which is equivalent to \u003Ccode>always_on(Update)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_debug_settings(TilemapDebugSettings)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>use \u003Ccode>new(...)\u003C/code> for state-scoped gameplay or tool modes\u003C/li>\n\u003Cli>use \u003Ccode>always_on(Update)\u003C/code> for examples, editors, or always-live world tooling\u003C/li>\n\u003Cli>if \u003Ccode>GizmoPlugin\u003C/code> is not present, the debug draw system is skipped automatically\u003C/li>\n\u003Cli>if render asset resources are not available, render chunk sync is skipped automatically and the logical/collision runtime still works\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TilemapGeometry\u003C/code>\u003C/h2>\n\u003Cp>Controls tile placement, world conversion, and chunk bounds.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>orientation: TilemapOrientation\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>grid_size: Vec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>tile_render_size: Vec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>origin: Vec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>row_direction: TileRowDirection\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Constructors\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TilemapGeometry::square(tile_size)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapGeometry::isometric_diamond(tile_render_size)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapGeometry::hex_pointy_columns(tile_render_size, TilemapHexParity)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapGeometry::hex_flat_rows(tile_render_size, TilemapHexParity)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Orientation variants\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TilemapOrientation::Square\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapOrientation::IsometricDiamond\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapOrientation::HexPointyColumns(TilemapHexParity)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapOrientation::HexFlatRows(TilemapHexParity)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>\u003Ccode>TilemapHexParity\u003C/code>\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TilemapHexParity::Odd\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TilemapHexParity::Even\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Builders\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>with_origin(Vec2)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_row_direction(TileRowDirection)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_tile_render_size(Vec2)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>keep \u003Ccode>grid_size.x &gt; 0.0\u003C/code> and \u003Ccode>grid_size.y &gt; 0.0\u003C/code>\u003C/li>\n\u003Cli>for square maps, \u003Ccode>grid_size\u003C/code> and \u003Ccode>tile_render_size\u003C/code> usually match\u003C/li>\n\u003Cli>for isometric maps, \u003Ccode>grid_size\u003C/code> should stay half-width and half-height of the rendered diamond unless you are intentionally stretching or overlapping tiles\u003C/li>\n\u003Cli>for pointy-column hex maps, \u003Ccode>tile_render_size\u003C/code> should match the full rendered hex footprint and parity should match the source data layout\u003C/li>\n\u003Cli>for flat-row hex maps, \u003Ccode>tile_render_size\u003C/code> should match the full rendered hex footprint and parity should match the source data layout\u003C/li>\n\u003Cli>\u003Ccode>row_direction = Down\u003C/code> matches common 2D screen-space conventions\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>Tilemap\u003C/code>\u003C/h2>\n\u003Cp>Top-level logical map component.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>geometry: TilemapGeometry\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>chunk_size: UVec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>layers: BTreeMap&lt;TileLayerId, TileLayerState&gt;\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>chunk sizes between \u003Ccode>8x8\u003C/code> and \u003Ccode>32x32\u003C/code> are the practical starting range\u003C/li>\n\u003Cli>smaller chunks reduce the cost of isolated edits\u003C/li>\n\u003Cli>larger chunks reduce entity and mesh counts for mostly static maps\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TileLayerConfig\u003C/code>\u003C/h2>\n\u003Cp>Per-layer authored configuration.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>id: TileLayerId\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>name: String\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>visible: bool\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>offset: Vec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>render: Option&lt;TileLayerRenderConfig&gt;\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Constructors\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TileLayerConfig::visual(id, name, render)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileLayerConfig::logic_only(id, name)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_offset(Vec2)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>use \u003Ccode>logic_only(...)\u003C/code> for collision, navigation, or metadata layers that should not render\u003C/li>\n\u003Cli>prefer stable \u003Ccode>TileLayerId\u003C/code> values for persistence or editor adapters\u003C/li>\n\u003Cli>use \u003Ccode>offset\u003C/code> sparingly; it is best for parallax or overlay alignment, not as a replacement for a coherent map transform\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TileLayerRenderConfig\u003C/code>\u003C/h2>\n\u003Cp>Visual settings for a renderable layer.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>atlas: TileAtlasLayout\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>z_index: f32\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>tint: Color\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>alpha_mode: AlphaMode2d\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>chunk_sort_step: f32\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Defaults\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>z_index = 0.0\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>tint = Color::WHITE\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>alpha_mode = AlphaMode2d::Blend\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>chunk_sort_step = 0.0001\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Builders\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>with_z_index(f32)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_tint(Color)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_alpha_mode(AlphaMode2d)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_chunk_sort_step(f32)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>use larger \u003Ccode>z_index\u003C/code> values for overlays, highlights, or decals\u003C/li>\n\u003Cli>\u003Ccode>chunk_sort_step\u003C/code> matters for isometric and hex chunk ordering\u003C/li>\n\u003Cli>transparent oversized art should live on a dedicated layer when you need explicit ordering control\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TileAtlasLayout\u003C/code>\u003C/h2>\n\u003Cp>Describes how atlas indices map into UVs.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>image: Handle&lt;Image&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>texture_size: UVec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>tile_size: UVec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>columns: u32\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>rows: u32\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>padding: UVec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>margin: UVec2\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Constructors and builders\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TileAtlasLayout::from_grid(image, texture_size, tile_size, columns, rows)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_padding(UVec2)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_margin(UVec2)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>columns * rows\u003C/code> defines the valid atlas index range\u003C/li>\n\u003Cli>set \u003Ccode>padding\u003C/code> and \u003Ccode>margin\u003C/code> when importing atlas sheets that were packed with gutters\u003C/li>\n\u003Cli>prefer nearest sampling in examples or pixel-art workflows\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TileKind\u003C/code>\u003C/h2>\n\u003Cp>Reusable tile definition.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>name: String\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>render: TileRenderRule\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>collision: Option&lt;TileCollisionDescriptor&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>flags: u32\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>movement_cost: u16\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Constructors\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TileKind::static_tile(name, atlas_index)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileKind::animated_tile(name, TileAnimation)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>TileKind::autotile(name, AutotileBinding)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Builders\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>with_collision(TileCollisionDescriptor)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_flags(u32)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_movement_cost(u16)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>keep tile definitions reusable and data-oriented\u003C/li>\n\u003Cli>use \u003Ccode>flags\u003C/code> for small shared bitfields, not game-specific object graphs\u003C/li>\n\u003Cli>\u003Ccode>movement_cost = 1\u003C/code> is the intended baseline\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>AutotileRuleSet\u003C/code>\u003C/h2>\n\u003Cp>Rule table for reusable autotile matching.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>neighborhood: AutotileNeighborhood\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>variants: BTreeMap&lt;u16, u32&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>fallback_atlas_index: u32\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>Cardinal4\u003C/code> fits roads, rivers, walls, and pipe-style connectors\u003C/li>\n\u003Cli>\u003Ccode>Moore8\u003C/code> is more appropriate for full blob or terrain masks\u003C/li>\n\u003Cli>missing masks fall back to \u003Ccode>fallback_atlas_index\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TileAnimation\u003C/code>\u003C/h2>\n\u003Cp>Definition-driven animated tile clip.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>frames: Vec&lt;TileAnimationFrame&gt;\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>frame durations should stay positive\u003C/li>\n\u003Cli>animation cost scales with the number of chunks containing the animated kind, not the number of tile entities\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TilemapDebugSettings\u003C/code>\u003C/h2>\n\u003Cp>Runtime debug resource.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>enabled: bool\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>draw_chunk_bounds: bool\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>draw_dirty_chunks: bool\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>chunk_color: Color\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>dirty_color: Color\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>collision_color: Color\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Defaults\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>enabled = false\u003C/code>\u003C/li>\n\u003Cli>chunk bounds enabled\u003C/li>\n\u003Cli>dirty chunk bounds enabled\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>enable this in labs and sandboxes, not by default in shipping game scenes\u003C/li>\n\u003Cli>dirty chunk drawing is useful for validating edit locality and animation rebuild scopes\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TilePathOptions\u003C/code>\u003C/h2>\n\u003Cp>Options for the A* pathfinding algorithm.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>max_cost: u32\u003C/code> — maximum total path cost before giving up. Default: \u003Ccode>u32::MAX\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>diagonal: bool\u003C/code> — whether to allow diagonal movement on square/iso grids. Default: \u003Ccode>false\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Builders\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>with_max_cost(u32)\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>with_diagonal(bool)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>set \u003Ccode>max_cost\u003C/code> to limit search radius for performance or gameplay reasons\u003C/li>\n\u003Cli>\u003Ccode>diagonal = true\u003C/code> allows 8-directional movement; path steps include diagonals\u003C/li>\n\u003Cli>hex grids ignore the \u003Ccode>diagonal\u003C/code> flag and always use 6 neighbors\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TilePathResult\u003C/code>\u003C/h2>\n\u003Cp>Result of a successful pathfinding query.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>path: Vec&lt;TileCoord&gt;\u003C/code> — ordered tile coordinates from start to goal (inclusive)\u003C/li>\n\u003Cli>\u003Ccode>total_cost: u32\u003C/code> — accumulated movement cost along the path\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TileKindPathPolicy\u003C/code>\u003C/h2>\n\u003Cp>Built-in pathfinding policy used by \u003Ccode>find_path(...)\u003C/code> and \u003Ccode>reachable_tiles(...)\u003C/code>.\u003C/p>\n\u003Ch3>Behavior\u003C/h3>\n\u003Cul>\n\u003Cli>destination tiles must exist on the queried layer\u003C/li>\n\u003Cli>same-layer tiles with \u003Ccode>TileCollisionDescriptor\u003C/code> are impassable\u003C/li>\n\u003Cli>same-layer \u003Ccode>TileKind.movement_cost\u003C/code> is used as the per-step cost\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>use this when the queried layer already contains the locomotion metadata you want\u003C/li>\n\u003Cli>switch to \u003Ccode>find_path_with_policy(...)\u003C/code> or \u003Ccode>reachable_tiles_with_policy(...)\u003C/code> when movement depends on other layers or agent-specific rules\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TilePathStep&lt;&#39;a&gt;\u003C/code>\u003C/h2>\n\u003Cp>Context passed into custom \u003Ccode>TilePathPolicy\u003C/code> implementations and \u003Ccode>TilePathCallbacks\u003C/code>.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>map: &amp;Tilemap\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>layer_id: TileLayerId\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>layer: &amp;TileLayerState\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>from: TileCoord\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>to: TileCoord\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>from_tile: Option&lt;&amp;TileCell&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>from_kind: Option&lt;&amp;TileKind&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>to_tile: Option&lt;&amp;TileCell&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>to_kind: Option&lt;&amp;TileKind&gt;\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>inspect \u003Ccode>to_kind\u003C/code> / \u003Ccode>to_tile\u003C/code> for same-layer terrain decisions\u003C/li>\n\u003Cli>inspect \u003Ccode>map\u003C/code> when passability or cost depends on other layers\u003C/li>\n\u003Cli>prefer positive movement costs for passable tiles\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TilePathCallbacks\u003C/code>\u003C/h2>\n\u003Cp>Closure adapter for custom pathfinding rules.\u003C/p>\n\u003Ch3>Constructor\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TilePathCallbacks::new(passability, movement_cost)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>use this for one-off closures in examples, tools, or gameplay systems\u003C/li>\n\u003Cli>implement \u003Ccode>TilePathPolicy\u003C/code> directly for reusable agent types or locomotion presets\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>TiledImportOptions\u003C/code>\u003C/h2>\n\u003Cp>Runtime import surface for normalized Tiled JSON ingestion.\u003C/p>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>atlas: TileAtlasLayout\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>catalog: TileCatalog\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>gid_to_kind: BTreeMap&lt;u32, TileKindId&gt;\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>chunk_size: UVec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>origin: Vec2\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>row_direction: TileRowDirection\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>layer_z_step: f32\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>logic_only_layers: BTreeSet&lt;String&gt;\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Constructor\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>TiledImportOptions::new(atlas, catalog, gid_to_kind)\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Ch3>Guidance\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>gid_to_kind\u003C/code> should map stripped Tiled global tile IDs, not flip-flagged values\u003C/li>\n\u003Cli>\u003Ccode>logic_only_layers\u003C/code> is useful for collision, nav, and metadata layers that should import but not render\u003C/li>\n\u003Cli>\u003Ccode>layer_z_step\u003C/code> becomes the per-layer \u003Ccode>z_index\u003C/code> increment for imported visual layers\u003C/li>\n\u003Cli>\u003Ccode>origin\u003C/code> and \u003Ccode>row_direction\u003C/code> should match the world-space convention used by the rest of your app\u003C/li>\n\u003C/ul>\n\u003Ch2>\u003Ccode>ImportedTilemapScene\u003C/code>\u003C/h2>\n\u003Ch3>Fields\u003C/h3>\n\u003Cul>\n\u003Cli>\u003Ccode>map: Tilemap\u003C/code>\u003C/li>\n\u003Cli>\u003Ccode>object_spawns: Vec&lt;TileObjectSpawn&gt;\u003C/code>\u003C/li>\n\u003C/ul>\n\u003Cp>The importer intentionally returns normalized object-layer spawn descriptors instead of spawning entities directly. That keeps scene/entity instantiation policy outside the durable tile runtime.\u003C/p>\n",title:"`saddle-world-tilemap` Configuration",description:"`saddle-world-tilemap` Configuration documentation",rawMarkdown:"## `TilemapPlugin`\n\nRuntime integration surface for logical maps, chunk sync, animation, and debug drawing.\n\n### Fields\n\n- `activate_schedule: Interned\u003Cdyn ScheduleLabel>`\n- `deactivate_schedule: Interned\u003Cdyn ScheduleLabel>`\n- `update_schedule: Interned\u003Cdyn ScheduleLabel>`\n- `debug_settings: TilemapDebugSettings`\n\n### Constructors\n\n- `TilemapPlugin::new(activate, deactivate, update)`\n- `TilemapPlugin::always_on(update)`\n- `TilemapPlugin::default()` which is equivalent to `always_on(Update)`\n- `with_debug_settings(TilemapDebugSettings)`\n\n### Guidance\n\n- use `new(...)` for state-scoped gameplay or tool modes\n- use `always_on(Update)` for examples, editors, or always-live world tooling\n- if `GizmoPlugin` is not present, the debug draw system is skipped automatically\n- if render asset resources are not available, render chunk sync is skipped automatically and the logical/collision runtime still works\n\n## `TilemapGeometry`\n\nControls tile placement, world conversion, and chunk bounds.\n\n### Fields\n\n- `orientation: TilemapOrientation`\n- `grid_size: Vec2`\n- `tile_render_size: Vec2`\n- `origin: Vec2`\n- `row_direction: TileRowDirection`\n\n### Constructors\n\n- `TilemapGeometry::square(tile_size)`\n- `TilemapGeometry::isometric_diamond(tile_render_size)`\n- `TilemapGeometry::hex_pointy_columns(tile_render_size, TilemapHexParity)`\n- `TilemapGeometry::hex_flat_rows(tile_render_size, TilemapHexParity)`\n\n### Orientation variants\n\n- `TilemapOrientation::Square`\n- `TilemapOrientation::IsometricDiamond`\n- `TilemapOrientation::HexPointyColumns(TilemapHexParity)`\n- `TilemapOrientation::HexFlatRows(TilemapHexParity)`\n\n### `TilemapHexParity`\n\n- `TilemapHexParity::Odd`\n- `TilemapHexParity::Even`\n\n### Builders\n\n- `with_origin(Vec2)`\n- `with_row_direction(TileRowDirection)`\n- `with_tile_render_size(Vec2)`\n\n### Guidance\n\n- keep `grid_size.x > 0.0` and `grid_size.y > 0.0`\n- for square maps, `grid_size` and `tile_render_size` usually match\n- for isometric maps, `grid_size` should stay half-width and half-height of the rendered diamond unless you are intentionally stretching or overlapping tiles\n- for pointy-column hex maps, `tile_render_size` should match the full rendered hex footprint and parity should match the source data layout\n- for flat-row hex maps, `tile_render_size` should match the full rendered hex footprint and parity should match the source data layout\n- `row_direction = Down` matches common 2D screen-space conventions\n\n## `Tilemap`\n\nTop-level logical map component.\n\n### Fields\n\n- `geometry: TilemapGeometry`\n- `chunk_size: UVec2`\n- `layers: BTreeMap\u003CTileLayerId, TileLayerState>`\n\n### Guidance\n\n- chunk sizes between `8x8` and `32x32` are the practical starting range\n- smaller chunks reduce the cost of isolated edits\n- larger chunks reduce entity and mesh counts for mostly static maps\n\n## `TileLayerConfig`\n\nPer-layer authored configuration.\n\n### Fields\n\n- `id: TileLayerId`\n- `name: String`\n- `visible: bool`\n- `offset: Vec2`\n- `render: Option\u003CTileLayerRenderConfig>`\n\n### Constructors\n\n- `TileLayerConfig::visual(id, name, render)`\n- `TileLayerConfig::logic_only(id, name)`\n- `with_offset(Vec2)`\n\n### Guidance\n\n- use `logic_only(...)` for collision, navigation, or metadata layers that should not render\n- prefer stable `TileLayerId` values for persistence or editor adapters\n- use `offset` sparingly; it is best for parallax or overlay alignment, not as a replacement for a coherent map transform\n\n## `TileLayerRenderConfig`\n\nVisual settings for a renderable layer.\n\n### Fields\n\n- `atlas: TileAtlasLayout`\n- `z_index: f32`\n- `tint: Color`\n- `alpha_mode: AlphaMode2d`\n- `chunk_sort_step: f32`\n\n### Defaults\n\n- `z_index = 0.0`\n- `tint = Color::WHITE`\n- `alpha_mode = AlphaMode2d::Blend`\n- `chunk_sort_step = 0.0001`\n\n### Builders\n\n- `with_z_index(f32)`\n- `with_tint(Color)`\n- `with_alpha_mode(AlphaMode2d)`\n- `with_chunk_sort_step(f32)`\n\n### Guidance\n\n- use larger `z_index` values for overlays, highlights, or decals\n- `chunk_sort_step` matters for isometric and hex chunk ordering\n- transparent oversized art should live on a dedicated layer when you need explicit ordering control\n\n## `TileAtlasLayout`\n\nDescribes how atlas indices map into UVs.\n\n### Fields\n\n- `image: Handle\u003CImage>`\n- `texture_size: UVec2`\n- `tile_size: UVec2`\n- `columns: u32`\n- `rows: u32`\n- `padding: UVec2`\n- `margin: UVec2`\n\n### Constructors and builders\n\n- `TileAtlasLayout::from_grid(image, texture_size, tile_size, columns, rows)`\n- `with_padding(UVec2)`\n- `with_margin(UVec2)`\n\n### Guidance\n\n- `columns * rows` defines the valid atlas index range\n- set `padding` and `margin` when importing atlas sheets that were packed with gutters\n- prefer nearest sampling in examples or pixel-art workflows\n\n## `TileKind`\n\nReusable tile definition.\n\n### Fields\n\n- `name: String`\n- `render: TileRenderRule`\n- `collision: Option\u003CTileCollisionDescriptor>`\n- `flags: u32`\n- `movement_cost: u16`\n\n### Constructors\n\n- `TileKind::static_tile(name, atlas_index)`\n- `TileKind::animated_tile(name, TileAnimation)`\n- `TileKind::autotile(name, AutotileBinding)`\n\n### Builders\n\n- `with_collision(TileCollisionDescriptor)`\n- `with_flags(u32)`\n- `with_movement_cost(u16)`\n\n### Guidance\n\n- keep tile definitions reusable and data-oriented\n- use `flags` for small shared bitfields, not game-specific object graphs\n- `movement_cost = 1` is the intended baseline\n\n## `AutotileRuleSet`\n\nRule table for reusable autotile matching.\n\n### Fields\n\n- `neighborhood: AutotileNeighborhood`\n- `variants: BTreeMap\u003Cu16, u32>`\n- `fallback_atlas_index: u32`\n\n### Guidance\n\n- `Cardinal4` fits roads, rivers, walls, and pipe-style connectors\n- `Moore8` is more appropriate for full blob or terrain masks\n- missing masks fall back to `fallback_atlas_index`\n\n## `TileAnimation`\n\nDefinition-driven animated tile clip.\n\n### Fields\n\n- `frames: Vec\u003CTileAnimationFrame>`\n\n### Guidance\n\n- frame durations should stay positive\n- animation cost scales with the number of chunks containing the animated kind, not the number of tile entities\n\n## `TilemapDebugSettings`\n\nRuntime debug resource.\n\n### Fields\n\n- `enabled: bool`\n- `draw_chunk_bounds: bool`\n- `draw_dirty_chunks: bool`\n- `chunk_color: Color`\n- `dirty_color: Color`\n- `collision_color: Color`\n\n### Defaults\n\n- `enabled = false`\n- chunk bounds enabled\n- dirty chunk bounds enabled\n\n### Guidance\n\n- enable this in labs and sandboxes, not by default in shipping game scenes\n- dirty chunk drawing is useful for validating edit locality and animation rebuild scopes\n\n## `TilePathOptions`\n\nOptions for the A* pathfinding algorithm.\n\n### Fields\n\n- `max_cost: u32` — maximum total path cost before giving up. Default: `u32::MAX`\n- `diagonal: bool` — whether to allow diagonal movement on square/iso grids. Default: `false`\n\n### Builders\n\n- `with_max_cost(u32)`\n- `with_diagonal(bool)`\n\n### Guidance\n\n- set `max_cost` to limit search radius for performance or gameplay reasons\n- `diagonal = true` allows 8-directional movement; path steps include diagonals\n- hex grids ignore the `diagonal` flag and always use 6 neighbors\n\n## `TilePathResult`\n\nResult of a successful pathfinding query.\n\n### Fields\n\n- `path: Vec\u003CTileCoord>` — ordered tile coordinates from start to goal (inclusive)\n- `total_cost: u32` — accumulated movement cost along the path\n\n## `TileKindPathPolicy`\n\nBuilt-in pathfinding policy used by `find_path(...)` and `reachable_tiles(...)`.\n\n### Behavior\n\n- destination tiles must exist on the queried layer\n- same-layer tiles with `TileCollisionDescriptor` are impassable\n- same-layer `TileKind.movement_cost` is used as the per-step cost\n\n### Guidance\n\n- use this when the queried layer already contains the locomotion metadata you want\n- switch to `find_path_with_policy(...)` or `reachable_tiles_with_policy(...)` when movement depends on other layers or agent-specific rules\n\n## `TilePathStep\u003C'a>`\n\nContext passed into custom `TilePathPolicy` implementations and `TilePathCallbacks`.\n\n### Fields\n\n- `map: &Tilemap`\n- `layer_id: TileLayerId`\n- `layer: &TileLayerState`\n- `from: TileCoord`\n- `to: TileCoord`\n- `from_tile: Option\u003C&TileCell>`\n- `from_kind: Option\u003C&TileKind>`\n- `to_tile: Option\u003C&TileCell>`\n- `to_kind: Option\u003C&TileKind>`\n\n### Guidance\n\n- inspect `to_kind` / `to_tile` for same-layer terrain decisions\n- inspect `map` when passability or cost depends on other layers\n- prefer positive movement costs for passable tiles\n\n## `TilePathCallbacks`\n\nClosure adapter for custom pathfinding rules.\n\n### Constructor\n\n- `TilePathCallbacks::new(passability, movement_cost)`\n\n### Guidance\n\n- use this for one-off closures in examples, tools, or gameplay systems\n- implement `TilePathPolicy` directly for reusable agent types or locomotion presets\n\n## `TiledImportOptions`\n\nRuntime import surface for normalized Tiled JSON ingestion.\n\n### Fields\n\n- `atlas: TileAtlasLayout`\n- `catalog: TileCatalog`\n- `gid_to_kind: BTreeMap\u003Cu32, TileKindId>`\n- `chunk_size: UVec2`\n- `origin: Vec2`\n- `row_direction: TileRowDirection`\n- `layer_z_step: f32`\n- `logic_only_layers: BTreeSet\u003CString>`\n\n### Constructor\n\n- `TiledImportOptions::new(atlas, catalog, gid_to_kind)`\n\n### Guidance\n\n- `gid_to_kind` should map stripped Tiled global tile IDs, not flip-flagged values\n- `logic_only_layers` is useful for collision, nav, and metadata layers that should import but not render\n- `layer_z_step` becomes the per-layer `z_index` increment for imported visual layers\n- `origin` and `row_direction` should match the world-space convention used by the rest of your app\n\n## `ImportedTilemapScene`\n\n### Fields\n\n- `map: Tilemap`\n- `object_spawns: Vec\u003CTileObjectSpawn>`\n\nThe importer intentionally returns normalized object-layer spawn descriptors instead of spawning entities directly. That keeps scene/entity instantiation policy outside the durable tile runtime.\n",slug:"configuration"},uses:{params:["slug"]}}],
+							form: null,
+							error: null
+						});
+					});
+				}
+			</script>
+		</div>
+	</body>
+</html>
